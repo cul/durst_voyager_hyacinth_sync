@@ -1,0 +1,7 @@
+Durst Voyager Hyacinth Sync
+
+Application for syncing Durst Voyager MARC data to Hyacinth.
+
+Maven build requires the following JVM options:
+
+-Xss2m (Because of: https://jira.codehaus.org/browse/PLXCOMP-208)
