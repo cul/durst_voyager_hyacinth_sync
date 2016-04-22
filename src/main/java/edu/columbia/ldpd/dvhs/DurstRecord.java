@@ -45,7 +45,172 @@ import com.opencsv.CSVReader;
 
 import edu.columbia.ldpd.dvhs.BetterMarcRecord;
 
-public class DurstRecord { 
+public class DurstRecord {
+	
+	private static final Pattern VALID_035_AND_776_FIELD_PATTERN = Pattern.compile("\\(OCoLC\\)(oc(m|n))*(0*)(\\d+)"); //including (0*) to remove leading zeros
+	
+	private JSONObject digitalObjectData;
+	private JSONObject dynamicFieldData;
+	private ArrayList<String> ocolc035FieldValues;
+	private ArrayList<String> ocolc776FieldValues;
+	private boolean isElectronicRecord = false; //true when 965 $a field == "eDurst"
+	private String pid = null;
+	
+	public DurstRecord(File marcXmlFile, File[] holdingsFiles, String[] barcodes) {
+		
+		// Get MARC record bibliographic data into a BetterMarcRecord
+		FileInputStream marcXmlFileInputStream = null;
+		try {
+			marcXmlFileInputStream = new FileInputStream(marcXmlFile);
+			MarcXmlReader reader = new MarcXmlReader(marcXmlFileInputStream);
+			if (reader.hasNext()) {
+				Record bibRecord = reader.next();
+				BetterMarcRecord betterMarcRecord = new BetterMarcRecord(bibRecord);
+
+				// If one of the 965 $a fields equals "965edurst" (with case insensitive check),
+				// this is an electronic record. Otherwise we expect to see "965durst" (with case
+				// insensitive check), indicating that this is a print record.
+				String value965Durst = get965DurstMarkerFromMarcRecord(betterMarcRecord);
+				
+				if(value965Durst.equals("965edurst")) {
+					// This is an electronic record
+					this.isElectronicRecord = true;
+					ocolc776FieldValues = getOcolc776ValuesFromMarcRecord(betterMarcRecord);
+					
+				} else {
+					// This is a print record
+					this.isElectronicRecord = false;
+					ocolc035FieldValues = getOcolc035ValuesFromMarcRecord(betterMarcRecord);
+				}
+			}
+			
+			// Close marc file input stream
+			try {
+				marcXmlFileInputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		// Determine whether this is an electronic record or print record
+		
+		// If this is an electronic record, get 776 ocolc values
+		// If this is a print record, get 035 ocolc values
+	}
+	
+	private String get965DurstMarkerFromMarcRecord(BetterMarcRecord betterMarcRecord) {
+		String normalized965MarkerValue = "";
+		ArrayList<DataField> fields = betterMarcRecord.getDataFields("965");
+		for(DataField field : fields) {
+			for(String subfieldValue : BetterMarcRecord.getDataFieldValue(field, null, null, 'a')) {
+				String value = subfieldValue.toLowerCase().trim();
+				if(value.endsWith("durst")) {
+					normalized965MarkerValue = value;
+				}
+			}
+		}
+		return normalized965MarkerValue;
+	}
+	
+	private ArrayList<String> getOcolc035ValuesFromMarcRecord(BetterMarcRecord betterMarcRecord) {
+		ArrayList<String> values = new ArrayList<String>();
+		//marc_identifier_035_ocolc_for_physical_records: ----- 035 $a, but only $a that contains "(OCoLC)" -----
+		ArrayList<DataField> fields = betterMarcRecord.getDataFields("035");
+		for(DataField field : fields) {
+			List<Subfield> subfields = field.getSubfields('a');
+			for(Subfield subfield : subfields) {
+				Matcher ocolcValue = VALID_035_AND_776_FIELD_PATTERN.matcher(subfield.getData());
+				if (ocolcValue.matches()) {
+					String newVal = "(OCoLC)" + ocolcValue.group(4);
+					if( ! values.contains(newVal) ) {
+						values.add("(OCoLC)" + ocolcValue.group(4));
+					}
+				}
+			}
+		}
+		return values;
+	}
+	
+	private ArrayList<String> getOcolc776ValuesFromMarcRecord(BetterMarcRecord betterMarcRecord) {
+		ArrayList<String> values = new ArrayList<String>();
+		//marc_identifier_776_ocolc_linker_field_for_electronic_records: ----- 776 $w, but only $w that contains "(OCoLC)" -----
+		ArrayList<DataField> fields = betterMarcRecord.getDataFields("776");
+		for(DataField field : fields) {
+			List<Subfield> subfields = field.getSubfields('w');
+			for(Subfield subfield : subfields) {
+				Matcher ocolcValue = VALID_035_AND_776_FIELD_PATTERN.matcher(subfield.getData());
+				if (ocolcValue.matches()) {
+					String newVal = "(OCoLC)" + ocolcValue.group(4);
+					if( ! values.contains(newVal) ) {
+						values.add(newVal);
+					}
+				}
+			}
+		}
+		return values;
+	}
+
+	public boolean isElectronicRecord() {
+		return this.isElectronicRecord;
+	}
+	
+	public ArrayList<String> getOcolc035FieldValues() {
+		return this.ocolc035FieldValues;
+	}
+	
+	public ArrayList<String> getOcolc776FieldValues() {
+		return this.ocolc776FieldValues;
+	}
+	
+	public void setPid(String pid) {
+		this.pid = pid;
+	}
+	
+	public String getPid() {
+		return this.pid;
+	}
+	
+	public boolean pidExistsInHyacinth() {
+		if(this.pid == null) {
+			return false;
+		}
+		
+		
+	}
+
+	/**
+	 * Returns an error message if there's a merge problem, or null if no problems are encountered.
+	 * @param printRecord
+	 * @param electronicRecord
+	 */
+	public static String mergeElectronicRecordDataIntoPrintRecord(DurstRecord printRecord, ArrayList<DurstRecord> electronicRecordsToMergeIn) {
+		// Safety check: Make sure that we're only merging electronic records into print records  
+		if( printRecord.isElectronicRecord() ) { return "Supplied printRecord was actually an electronic record."; }
+		for(DurstRecord electronicRecord : electronicRecordsToMergeIn) {
+			if( !electronicRecord.isElectronicRecord() ) { return "One of supplied electronicRecordsToMergeIn was actually a print record."; }
+		}
+		
+		// The records that we're merging should all have the same pid value, OR a
+		// null pid value (for new records). If we find two different pids among
+		// the set, something is wrong. This indicates that a prior merge
+		// happened improperly, or that the current intended merge is incorrect.
+		HashSet<String> pids = new HashSet<String>();
+		if(printRecord.pid != null) {
+			pids.add(printRecord.pid);
+		}
+		for(DurstRecord electronicRecord : electronicRecordsToMergeIn) {
+			if(electronicRecord.pid != null) {
+				pids.add(printRecord.pid);
+			}
+		}
+		if(pids.size() > 1) {
+			return "Tried to merge multiple records that already exist in Hyacinth. Pids: " + StringUtils.join(pids, ",") + ". You need to look at these records and possibly delete one of them (or do a manual merge and then delete). This was probably caused by the recent addition of a new record in Voyager (and even more likely, the creation of an electronic record before a print record).";
+		}
+		
+		return null;
+	}
 	
 //	private static Pattern valid035And776FieldPattern = Pattern.compile("\\(OCoLC\\)(oc(m|n))*(0*)(\\d+)"); //including (0*) to remove leading zeros
 //	

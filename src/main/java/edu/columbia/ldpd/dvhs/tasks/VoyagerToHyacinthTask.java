@@ -8,14 +8,19 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import edu.columbia.ldpd.dvhs.DurstRecord;
 import edu.columbia.ldpd.dvhs.DurstVoyagerHyacinthSync;
 import edu.columbia.ldpd.dvhs.VoyagerOracleDBHelper;
+import edu.columbia.ldpd.dvhs.tasks.workers.VoyagerToHyacinthWorker;
 import edu.columbia.ldpd.marc.z3950.MARCFetcher;
 
 public class VoyagerToHyacinthTask extends AbstractTask {
@@ -45,23 +50,66 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 		        return name.toLowerCase().endsWith(".xml");
 		    }
 		});
-		int numberOfFilesToProcess = marcXmlFiles.length;
 		
+		processFiles(marcXmlFiles);
+        
+		DurstVoyagerHyacinthSync.logger.info("Done.");
+	}
+	
+	public void processFiles(File[] marcXmlFiles) {
+		int numberOfFilesToProcess = marcXmlFiles.length;
 		DurstVoyagerHyacinthSync.logger.info("Now processing " + numberOfFilesToProcess + " MARC files...");
 		
-		//Process records
+		// Set up print and electronic record lists
+		ArrayList<DurstRecord> printRecords = new ArrayList<DurstRecord>();
+		ArrayList<DurstRecord> electronicRecords = new ArrayList<DurstRecord>();
+		// Set up ocolc mappings
+		HashMap<String, ArrayList<DurstRecord>> electronicRecordOcolcValuesToRecords = new HashMap<String, ArrayList<DurstRecord>>();
+		HashMap<String, ArrayList<DurstRecord>> printRecordOcolcValuesToRecords = new HashMap<String, ArrayList<DurstRecord>>();
+		
+		// Build records from data sources
 		int counter = 1;
 		for(File marcXmlFile : marcXmlFiles) {
 			try {
-				FileInputStream fis = new FileInputStream(marcXmlFile);
+				//Get bib id from Marc file filename
+				String bibId = marcXmlFile.getName().replace(".xml", "");
 				
+				//Read in associated holdings
+				File[] holdingsFiles = new File(DurstVoyagerHyacinthSync.MARC_HOLDINGS_DOWNLOAD_DIR + "/" + bibId).listFiles(new FilenameFilter() {
+				    public boolean accept(File dir, String name) {
+				        return name.toLowerCase().endsWith(".mrc");
+				    }
+				});
 				
+				//Read in associated barcodes
+				String[] barcodes = null;
+				File possibleBarcodeFile = new File(DurstVoyagerHyacinthSync.MARC_BARCODES_DOWNLOAD_DIR + "/" + bibId + ".barcodes");
+				if( possibleBarcodeFile.exists() ) {
+					barcodes = FileUtils.readFileToString(possibleBarcodeFile).split(",");
+				}
 				
-				//TODO: Do something with fis
+				DurstRecord record = new DurstRecord(marcXmlFile, holdingsFiles, barcodes);
 				
+				if(record.isElectronicRecord()) {
+					electronicRecords.add(record);
+					// Use 776 value  (if present) for electronic record ocolc value
+					for(String value776 : record.getOcolc776FieldValues()) {
+						if( !electronicRecordOcolcValuesToRecords.containsKey(value776) ) {
+							electronicRecordOcolcValuesToRecords.put(value776, new ArrayList<DurstRecord>());
+						}
+						electronicRecordOcolcValuesToRecords.get(value776).add(record);
+					}
+				} else {
+					printRecords.add(record);
+					// Use 035 value  (if present) for electronic record ocolc value
+					for(String value035 : record.getOcolc035FieldValues()) {
+						if( !printRecordOcolcValuesToRecords.containsKey(value035) ) {
+							printRecordOcolcValuesToRecords.put(value035, new ArrayList<DurstRecord>());
+						}
+						printRecordOcolcValuesToRecords.get(value035).add(record);
+					}
+				}
 				
-				
-				fis.close();
 			} catch (FileNotFoundException e) {
 				DurstVoyagerHyacinthSync.logger.error(
 					"Could not find file: " + marcXmlFile.getAbsolutePath() + "\n" +
@@ -73,20 +121,93 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 					"Message: " + e.getMessage()
 				);
 			}
-			System.out.println("Processed " + counter + " of " + numberOfFilesToProcess + " Site records.");
+			DurstVoyagerHyacinthSync.logger.info("Prepared " + counter + " of " + numberOfFilesToProcess + " Voyager records.");
 			counter++;
 		}
-        
-        System.out.println("Done.");
+		
+		// Merge records based on ocolc code
+		
+		// Here's what we want:
+		// - All physical (965durst) records get their own Hyacinth records.
+		// - Electronic (965eDurst) records that match to physical records are only merged into those physical records.
+		// - Update from meeting on 2015-06-02: We are no longer importing electronic records that aren't tied to print records.
+		
+		ArrayList<DurstRecord> finalizedRecordsToImport = new ArrayList<DurstRecord>();
+		HashSet<DurstRecord> electronicRecordsThatWereMergedIn = new HashSet<DurstRecord>(); // Just for debugging
+		ArrayList<String> mergeErrors = new ArrayList<String>();
+		
+		for(DurstRecord printRecord : printRecords) {
+			// Get electronic durst records that should be linked to this print one
+			ArrayList<DurstRecord> electronicRecordsToMergeIn = new ArrayList<DurstRecord>();
+			
+			// Determine which electronic records (if any) should be merged into this print record
+			if(printRecord.getOcolc035FieldValues().size() > 0) {
+				for(String marc035Value : printRecord.getOcolc035FieldValues()) {
+					if(electronicRecordOcolcValuesToRecords.containsKey(marc035Value)) {
+						for(DurstRecord electronicRecord : electronicRecordOcolcValuesToRecords.get(marc035Value)) {
+							electronicRecordsToMergeIn.add(electronicRecord);
+							electronicRecordsThatWereMergedIn.add(electronicRecord);
+						}						
+					}
+				}
+			}
+			
+			// Merge electronic records (if present) into this print record
+			String mergeError = DurstRecord.mergeElectronicRecordDataIntoPrintRecord(printRecord, electronicRecordsToMergeIn);
+			if(mergeError != null) {
+				mergeErrors.add(mergeError);
+			}
+			
+			finalizedRecordsToImport.add(printRecord);
+		}
+		
+		//Check for merge errors
+		if(mergeErrors.size() > 0) {
+			DurstVoyagerHyacinthSync.logger.error("Cancelling Voyager to Hyacinth update process because merge errors were encountered:\n" + StringUtils.join(mergeErrors, "\n"));
+			System.exit(DurstVoyagerHyacinthSync.EXIT_CODE_ERROR);
+		}
+		
+		sendRecordsToHyacinth(finalizedRecordsToImport);
+		
+		DurstVoyagerHyacinthSync.logger.info("--------------------------------");
+		DurstVoyagerHyacinthSync.logger.info("Print records found: " + printRecords.size());
+		DurstVoyagerHyacinthSync.logger.info("Electronic records found: " + electronicRecords.size());
+		DurstVoyagerHyacinthSync.logger.info("Print record ocolc values found: " + printRecordOcolcValuesToRecords.size());
+		DurstVoyagerHyacinthSync.logger.info("Electronic record ocolc values found: " + electronicRecordOcolcValuesToRecords.size());
+		DurstVoyagerHyacinthSync.logger.info("Electronic records merged in: " + electronicRecordsThatWereMergedIn.size());
+		DurstVoyagerHyacinthSync.logger.info("Number of merged records sent to Hyacinth: " + finalizedRecordsToImport.size());
+		DurstVoyagerHyacinthSync.logger.info("--------------------------------");
 	}
 	
+	private void sendRecordsToHyacinth(ArrayList<DurstRecord> finalizedRecordsToImport) {
+		// If we made it here, we're ready to send the records to Hyacinth
+		DurstVoyagerHyacinthSync.logger.info("Preparing to send records to Hyacinth...");
+		DurstVoyagerHyacinthSync.logger.info("Starting thread pool of size: " + DurstVoyagerHyacinthSync.maxNumberOfThreads);
+		ExecutorService executor = Executors.newFixedThreadPool(DurstVoyagerHyacinthSync.maxNumberOfThreads);
+		int i = 1;
+		int total = finalizedRecordsToImport.size();
+		for(DurstRecord record : finalizedRecordsToImport) {
+			Runnable worker = new VoyagerToHyacinthWorker(record, i, total);
+            executor.execute(worker);
+            System.out.println("Queued " + i + " of " + total);
+            i++;
+		}
+		executor.shutdown();
+        while (!executor.isTerminated()) {
+        	try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) { e.printStackTrace(); }
+        }
+        System.out.println("Thread pool has been shut down. All jobs are complete.");
+	}
+
 	public void clearDownloadedVoyagerContent() {
 		try {
 			FileUtils.deleteDirectory(new File(DurstVoyagerHyacinthSync.MARC_BIB_DOWNLOAD_DIR));
 			FileUtils.deleteDirectory(new File(DurstVoyagerHyacinthSync.MARC_HOLDINGS_DOWNLOAD_DIR));
 			FileUtils.deleteDirectory(new File(DurstVoyagerHyacinthSync.MARC_BARCODES_DOWNLOAD_DIR));
 		} catch (IOException e) {
-			System.out.println("Could not delete all downloaded voyager content for some reason. Tried to delete directory: " + DurstVoyagerHyacinthSync.MARC_BIB_DOWNLOAD_DIR);
+			DurstVoyagerHyacinthSync.logger.error("Could not delete all downloaded voyager content for some reason. Tried to delete directory: " + DurstVoyagerHyacinthSync.MARC_BIB_DOWNLOAD_DIR);
 			e.printStackTrace();
 		}
 	}
@@ -127,7 +248,7 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 		for(int i = 0; i < marcXmlFiles.length; i++) {
 			File marcXmlFile = marcXmlFiles[i];
 			String bibKey = FilenameUtils.removeExtension(marcXmlFile.getName());
-			System.out.println("Downloading holdings and barcodes for bib key " + i + " of " + marcXmlFiles.length + " (" + bibKey + ")");
+			DurstVoyagerHyacinthSync.logger.info("Downloading holdings and barcodes for bib key " + i + " of " + marcXmlFiles.length + " (" + bibKey + ")");
 			
 			try {
 				//Get holdings

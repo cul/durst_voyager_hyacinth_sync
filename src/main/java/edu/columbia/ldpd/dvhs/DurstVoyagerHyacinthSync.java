@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.columbia.ldpd.dvhs.tasks.AbstractTask;
-import edu.columbia.ldpd.dvhs.tasks.VoyagerToHyacinthTask;
+import edu.columbia.ldpd.dvhs.tasks.*;
 
 public class DurstVoyagerHyacinthSync {
 
@@ -46,13 +46,15 @@ public class DurstVoyagerHyacinthSync {
 	
 	public static boolean reuseLatestDownloadedVoyagerData;
 	public static boolean runTaskVoyagerToHyacinth;
+	public static boolean runTaskVoyagerConnectionTest;
+	public static boolean runTaskTest;
 	public static int maxNumberOfThreads;
 	public static long minAvailableMemoryInBytesForNewProcess;
 
 	public static void main(String[] args) {
 		
 		logger.info("Starting Durst Voyager Hyacinth Sync run.");
-		logger.debug("Logger running in debug mode."); //Only shows up when we're logging in debug mode
+		logger.debug("Logger logging in debug mode.");
 		
 		setupAndParseCommandLineOptions(args);
 		
@@ -77,6 +79,8 @@ public class DurstVoyagerHyacinthSync {
 		
 		//Proper task order defined below
 		if(DurstVoyagerHyacinthSync.runTaskVoyagerToHyacinth){ tasksToRun.add(new VoyagerToHyacinthTask()); }
+		if(DurstVoyagerHyacinthSync.runTaskVoyagerConnectionTest) { tasksToRun.add(new VoyagerConnectionTestTask()); }
+		if(DurstVoyagerHyacinthSync.runTaskTest) { tasksToRun.add(new TestTask()); }
 		
 		for(AbstractTask task : tasksToRun) {
 			task.runTask();
@@ -112,6 +116,10 @@ public class DurstVoyagerHyacinthSync {
 		// Task-related options
 		options.addOption("run_task_voyager_to_hyacinth", false,
 				"Process site data from Voyager (and related hosts file) and save it to Hyacinth.");
+		options.addOption("run_task_voyager_connection_test", false,
+				"Test connection to voyager.");
+		options.addOption("run_task_test", false,
+				"Test task. Actual function varies. Only used during development).");
 		// Thread/Memory options
 		options.addOption("max_number_of_threads", true,
 				"Maximum number of threads to use for concurrent processing (when applicable).");
@@ -140,6 +148,8 @@ public class DurstVoyagerHyacinthSync {
 				
 				DurstVoyagerHyacinthSync.reuseLatestDownloadedVoyagerData = cmdLine.hasOption("reuse_latest_downloaded_marc_data");
 				DurstVoyagerHyacinthSync.runTaskVoyagerToHyacinth = cmdLine.hasOption("run_task_voyager_to_hyacinth");
+				DurstVoyagerHyacinthSync.runTaskVoyagerConnectionTest = cmdLine.hasOption("run_task_voyager_connection_test");
+				DurstVoyagerHyacinthSync.runTaskTest = cmdLine.hasOption("run_task_test");
 				DurstVoyagerHyacinthSync.maxNumberOfThreads = Integer.parseInt(cmdLine.getOptionValue("max_number_of_threads", "1"));
 				
 				if(cmdLine.hasOption("min_available_memory_in_bytes_for_new_process")) {
