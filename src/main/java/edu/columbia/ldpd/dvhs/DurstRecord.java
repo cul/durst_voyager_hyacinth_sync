@@ -44,6 +44,7 @@ import org.marc4j.marc.Subfield;
 import com.opencsv.CSVReader;
 
 import edu.columbia.ldpd.dvhs.BetterMarcRecord;
+import edu.columbia.ldpd.dvhs.utils.HyacinthUtils;
 
 public class DurstRecord {
 	
@@ -57,6 +58,12 @@ public class DurstRecord {
 	private String pid = null;
 	
 	public DurstRecord(File marcXmlFile, File[] holdingsFiles, String[] barcodes) {
+		
+		this.digitalObjectData = new JSONObject();
+		this.dynamicFieldData = new JSONObject();
+		try {
+			this.digitalObjectData.put("dynamic_field_data", this.dynamicFieldData);
+		} catch (JSONException e1) { e1.printStackTrace(); }
 		
 		// Get MARC record bibliographic data into a BetterMarcRecord
 		FileInputStream marcXmlFileInputStream = null;
@@ -82,6 +89,8 @@ public class DurstRecord {
 					this.isElectronicRecord = false;
 					ocolc035FieldValues = getOcolc035ValuesFromMarcRecord(betterMarcRecord);
 				}
+				
+				extractMarcData(betterMarcRecord);
 			}
 			
 			// Close marc file input stream
@@ -90,7 +99,7 @@ public class DurstRecord {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException | JSONException e) {
 			e.printStackTrace();
 		}
 		
@@ -98,6 +107,45 @@ public class DurstRecord {
 		
 		// If this is an electronic record, get 776 ocolc values
 		// If this is a print record, get 035 ocolc values
+	}
+	
+	private void extractMarcData(BetterMarcRecord betterMarcRecord) throws JSONException {
+		ArrayList<DataField> fields; // This variable is reused many times throughout this method
+		
+		// clio_identifier-1:clio_identifier_value
+		// MARC 001
+		dynamicFieldData.put("clio_identifier", new JSONArray().put(new JSONObject().put("clio_identifier_value", betterMarcRecord.getControlField("001").getData().trim())));
+		
+		// marc_005_last_modified-1:marc_005_last_modified_value
+		// MARC 005
+		dynamicFieldData.put("marc_005_last_modified", new JSONArray().put(new JSONObject().put("clio_identifier_value", betterMarcRecord.getControlField("005").getData().trim())));
+		
+		// title-1:title_non_sort_portion
+		// title-1:title_sort_portion
+		// MARC 245 
+		// title: ----- 245 $a,$b,$n,$p -- indicator 2 for num nonsort chars ----- 
+		fields = betterMarcRecord.getDataFields("245");
+		for(DataField field : fields) {
+			int numNonSortCharacters = Integer.parseInt(""+field.getIndicator2());
+			String result = BetterMarcRecord.removeCommonTrailingCharacters(
+				StringUtils.join(BetterMarcRecord.getDataFieldValue(field, null, null, 'a'), ", ").trim() + " " +
+				StringUtils.join(BetterMarcRecord.getDataFieldValue(field, null, null, 'b'), ", ").trim() + " " +
+				StringUtils.join(BetterMarcRecord.getDataFieldValue(field, null, null, 'n'), ", ").trim() + " " +
+				StringUtils.join(BetterMarcRecord.getDataFieldValue(field, null, null, 'p'), ", ").trim()
+			).replaceAll(" +", " "); //replaceAll with regex to convert multiple spaces into a single space
+			if( ! result.isEmpty() ) {
+				dynamicFieldData.put("title", new JSONArray().put(new JSONObject()
+						.put("title_non_sort_portion", result.substring(0, numNonSortCharacters).trim())
+						.put("title_sort_portion", result.substring(numNonSortCharacters).trim())
+					)
+				);
+			}
+		}
+		
+	}
+
+	public JSONObject getDigitalObjectData() {
+		return this.digitalObjectData;
 	}
 	
 	private String get965DurstMarkerFromMarcRecord(BetterMarcRecord betterMarcRecord) {
@@ -171,14 +219,6 @@ public class DurstRecord {
 	public String getPid() {
 		return this.pid;
 	}
-	
-	public boolean pidExistsInHyacinth() {
-		if(this.pid == null) {
-			return false;
-		}
-		
-		
-	}
 
 	/**
 	 * Returns an error message if there's a merge problem, or null if no problems are encountered.
@@ -210,6 +250,34 @@ public class DurstRecord {
 		}
 		
 		return null;
+	}
+
+	public String getMarc005Value() {
+		try {
+			if(this.dynamicFieldData.has("marc_005_last_modified") && this.dynamicFieldData.getJSONArray("marc_005_last_modified").length() > 0) {
+				return this.dynamicFieldData.getJSONArray("marc_005_last_modified").getJSONObject(0).getString("marc_005_last_modified_value");
+			}
+		} catch (JSONException e) {
+			DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + ": " + e.getMessage());
+		}
+		return "-1";
+	}
+
+	public ArrayList<String> getClioIdentifiers() {
+		ArrayList<String> clioIdentifiers = new ArrayList<String>();
+		
+		try {
+			if(this.dynamicFieldData.has("clio_identifier") && this.dynamicFieldData.getJSONArray("clio_identifier").length() > 0) {
+				JSONArray jsonArr = this.dynamicFieldData.getJSONArray("clio_identifier");
+				for(int i = 0; i < jsonArr.length(); i++) {
+					clioIdentifiers.add(jsonArr.getJSONObject(0).getString("clio_identifier_value"));
+				}
+			}
+		} catch (JSONException e) {
+			DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + ": " + e.getMessage());
+		}
+				
+		return clioIdentifiers;
 	}
 	
 //	private static Pattern valid035And776FieldPattern = Pattern.compile("\\(OCoLC\\)(oc(m|n))*(0*)(\\d+)"); //including (0*) to remove leading zeros

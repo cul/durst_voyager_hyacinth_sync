@@ -8,8 +8,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-//import org.archive.io.arc.ARCReaderFactory;
-//import org.archive.io.warc.WARCReaderFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +44,18 @@ public class DurstVoyagerHyacinthSync {
 	public static String voyagerOracleDBPassword;
 	
 	public static boolean reuseLatestDownloadedVoyagerData;
+	public static boolean publishAfterSave;
+	public static boolean doTestSaveOnly;
+	
 	public static boolean runTaskVoyagerToHyacinth;
 	public static boolean runTaskVoyagerConnectionTest;
 	public static boolean runTaskTest;
+	
+	public static int maxNumberOfRecordsToSync; //only used during development
+
 	public static int maxNumberOfThreads;
 	public static long minAvailableMemoryInBytesForNewProcess;
-
+	
 	public static void main(String[] args) {
 		
 		logger.info("Starting Durst Voyager Hyacinth Sync run.");
@@ -113,13 +118,20 @@ public class DurstVoyagerHyacinthSync {
 				"Password for the username used to log into the specified Voyager Oracle database.");
 		options.addOption("reuse_latest_downloaded_marc_data", false,
 				"Reuse latest copy of downloaded marc data rather than downloading the latest version.");
-		// Task-related options
+		options.addOption("publish_after_save", false,
+				"Publish records after saving them in Hyacinth (applies to the Voyager to Hyacinth sync task).");
+		options.addOption("do_test_save_only", false,
+				"Send the test param when saving Hyacinth records so that they're not actually saved (applies to the Voyager to Hyacinth sync task).");
+		// Task options
 		options.addOption("run_task_voyager_to_hyacinth", false,
 				"Process site data from Voyager (and related hosts file) and save it to Hyacinth.");
 		options.addOption("run_task_voyager_connection_test", false,
 				"Test connection to voyager.");
 		options.addOption("run_task_test", false,
 				"Test task. Actual function varies. Only used during development).");
+		//For Testing
+		options.addOption("max_number_of_records_to_sync", true,
+				"Maximum number of records to sync (applies to the Voyager to Hyacinth sync task, only used during development).");
 		// Thread/Memory options
 		options.addOption("max_number_of_threads", true,
 				"Maximum number of threads to use for concurrent processing (when applicable).");
@@ -147,9 +159,13 @@ public class DurstVoyagerHyacinthSync {
 				DurstVoyagerHyacinthSync.voyagerOracleDBPassword = cmdLine.getOptionValue("voyager_oracle_db_password", null);
 				
 				DurstVoyagerHyacinthSync.reuseLatestDownloadedVoyagerData = cmdLine.hasOption("reuse_latest_downloaded_marc_data");
+				DurstVoyagerHyacinthSync.publishAfterSave = cmdLine.hasOption("publish_after_save");
+				DurstVoyagerHyacinthSync.doTestSaveOnly = cmdLine.hasOption("do_test_save_only");
 				DurstVoyagerHyacinthSync.runTaskVoyagerToHyacinth = cmdLine.hasOption("run_task_voyager_to_hyacinth");
 				DurstVoyagerHyacinthSync.runTaskVoyagerConnectionTest = cmdLine.hasOption("run_task_voyager_connection_test");
 				DurstVoyagerHyacinthSync.runTaskTest = cmdLine.hasOption("run_task_test");
+				
+				DurstVoyagerHyacinthSync.maxNumberOfRecordsToSync = Integer.parseInt(cmdLine.getOptionValue("max_number_of_records_to_sync", "-1"));
 				DurstVoyagerHyacinthSync.maxNumberOfThreads = Integer.parseInt(cmdLine.getOptionValue("max_number_of_threads", "1"));
 				
 				if(cmdLine.hasOption("min_available_memory_in_bytes_for_new_process")) {

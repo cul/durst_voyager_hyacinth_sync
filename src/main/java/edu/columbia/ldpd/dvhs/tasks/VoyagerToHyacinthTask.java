@@ -16,11 +16,14 @@ import java.util.concurrent.Executors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
 
 import edu.columbia.ldpd.dvhs.DurstRecord;
 import edu.columbia.ldpd.dvhs.DurstVoyagerHyacinthSync;
 import edu.columbia.ldpd.dvhs.VoyagerOracleDBHelper;
+import edu.columbia.ldpd.dvhs.exceptions.MultipleRecordsException;
 import edu.columbia.ldpd.dvhs.tasks.workers.VoyagerToHyacinthWorker;
+import edu.columbia.ldpd.dvhs.utils.HyacinthUtils;
 import edu.columbia.ldpd.marc.z3950.MARCFetcher;
 
 public class VoyagerToHyacinthTask extends AbstractTask {
@@ -70,6 +73,12 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 		// Build records from data sources
 		int counter = 1;
 		for(File marcXmlFile : marcXmlFiles) {
+			
+			if(DurstVoyagerHyacinthSync.maxNumberOfRecordsToSync != -1 && counter > DurstVoyagerHyacinthSync.maxNumberOfRecordsToSync) {
+            	DurstVoyagerHyacinthSync.logger.info("Only preparing " + DurstVoyagerHyacinthSync.maxNumberOfRecordsToSync + " MARC records because of limit imposed by command line arg max_number_of_records_to_sync.");
+            	break;
+            }
+			
 			try {
 				//Get bib id from Marc file filename
 				String bibId = marcXmlFile.getName().replace(".xml", "");
@@ -110,16 +119,25 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 					}
 				}
 				
+				// Check to see if Hyacinth record exists for this Durst voyager record, based on CLIO id:
+				String possiblePid = HyacinthUtils.getPidForClioIdentifier(record.getClioIdentifiers().get(0));
+				
 			} catch (FileNotFoundException e) {
 				DurstVoyagerHyacinthSync.logger.error(
 					"Could not find file: " + marcXmlFile.getAbsolutePath() + "\n" +
 					"Message: " + e.getMessage()
 				);
+				return;
 			} catch (IOException e) {
 				DurstVoyagerHyacinthSync.logger.error(
 					"IOException encountered while processing file: " + marcXmlFile.getAbsolutePath() + "\n" +
 					"Message: " + e.getMessage()
 				);
+				return;
+			} catch (MultipleRecordsException | JSONException e) {
+				// TODO Auto-generated catch block
+				DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + ": " + e.getMessage());
+				return;
 			}
 			DurstVoyagerHyacinthSync.logger.info("Prepared " + counter + " of " + numberOfFilesToProcess + " Voyager records.");
 			counter++;
@@ -189,7 +207,7 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 		for(DurstRecord record : finalizedRecordsToImport) {
 			Runnable worker = new VoyagerToHyacinthWorker(record, i, total);
             executor.execute(worker);
-            System.out.println("Queued " + i + " of " + total);
+            DurstVoyagerHyacinthSync.logger.info("Queued " + i + " of " + total);
             i++;
 		}
 		executor.shutdown();
