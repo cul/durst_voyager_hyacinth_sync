@@ -33,7 +33,7 @@ public class VoyagerToHyacinthWorker implements Runnable {
 				HyacinthUtils.sendDurstRecordToHyacinth(this.record, DurstVoyagerHyacinthSync.publishAfterSave, DurstVoyagerHyacinthSync.doTestSaveOnly);
 			}
 		} catch (JSONException | IOException e) {
-			DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + " for record with pid " + record.getPid() + " and clio identifiers " + StringUtils.join(record.getClioIdentifiers(), ",") + ": " + e.getMessage());
+			DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + " for record with pid " + record.getPid() + " and clio identifiers " + StringUtils.join(record.getClioIdentifiers(), ",") + ": " + e.getMessage() + "\n" + StringUtils.join(e.getStackTrace(), "\n"));
 		}
 	}
 

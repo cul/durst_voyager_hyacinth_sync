@@ -119,24 +119,32 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 					}
 				}
 				
-				// Check to see if Hyacinth record exists for this Durst voyager record, based on CLIO id:
-				String possiblePid = HyacinthUtils.getPidForClioIdentifier(record.getClioIdentifiers().get(0));
+				// Check to see if Hyacinth record exists for this Durst voyager
+				// record, based on CLIO id. If so, assign that PID to this
+				// record so that we do an UPDATE operation instead of CREATE.
+				String pid = HyacinthUtils.getPidForClioIdentifier(record.getClioIdentifiers().get(0));
+				if(pid != null) {
+					record.setPid(pid);
+				}
 				
 			} catch (FileNotFoundException e) {
 				DurstVoyagerHyacinthSync.logger.error(
 					"Could not find file: " + marcXmlFile.getAbsolutePath() + "\n" +
 					"Message: " + e.getMessage()
 				);
+				System.exit(DurstVoyagerHyacinthSync.EXIT_CODE_ERROR);
 				return;
 			} catch (IOException e) {
 				DurstVoyagerHyacinthSync.logger.error(
 					"IOException encountered while processing file: " + marcXmlFile.getAbsolutePath() + "\n" +
 					"Message: " + e.getMessage()
 				);
+				System.exit(DurstVoyagerHyacinthSync.EXIT_CODE_ERROR);
 				return;
 			} catch (MultipleRecordsException | JSONException e) {
 				// TODO Auto-generated catch block
 				DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + ": " + e.getMessage());
+				System.exit(DurstVoyagerHyacinthSync.EXIT_CODE_ERROR);
 				return;
 			}
 			DurstVoyagerHyacinthSync.logger.info("Prepared " + counter + " of " + numberOfFilesToProcess + " Voyager records.");

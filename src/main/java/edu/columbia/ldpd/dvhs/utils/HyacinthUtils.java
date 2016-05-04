@@ -169,17 +169,23 @@ public class HyacinthUtils {
 		
 		// Handle response
 		
-//		System.out.println("Response: " + resultSb.toString());
-		
-		JSONObject jsonResponse = new JSONObject(resultSb.toString());
-		//System.out.println(jsonResponse.toString());
-		if(jsonResponse.getBoolean("success") == true) {
-			// Success!
-		} else {
-			DurstVoyagerHyacinthSync.logger.error("Error encountered during Hyacinth record save (for pid "
+		JSONObject jsonResponse;
+		try {
+			jsonResponse = new JSONObject(resultSb.toString());
+			if(jsonResponse.getBoolean("success") == true) {
+				// Success!
+			} else {
+				DurstVoyagerHyacinthSync.logger.error("Error encountered during Hyacinth record save (for pid "
+					+ pid + ", with CLIO bib(s): " + StringUtils.join(record.getClioIdentifiers(), ",") + "\n" +
+					"Error " + jsonResponse.toString()
+				);
+			}
+		} catch (JSONException e) {
+			DurstVoyagerHyacinthSync.logger.error("Invalid JSON encountered during Hyacinth record save (for pid "
 				+ pid + ", with CLIO bib(s): " + StringUtils.join(record.getClioIdentifiers(), ",") + "\n" +
-				"Error " + jsonResponse.toString()
+				"Server response:\n" + resultSb.toString()
 			);
+			throw e;
 		}
 		
 	}
