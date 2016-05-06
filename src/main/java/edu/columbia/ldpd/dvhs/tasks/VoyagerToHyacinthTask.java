@@ -179,7 +179,17 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 			}
 			
 			// Merge electronic records (if present) into this print record
-			String mergeError = DurstRecord.mergeElectronicRecordDataIntoPrintRecord(printRecord, electronicRecordsToMergeIn);
+			String mergeError = null;
+			try {
+				mergeError = DurstRecord.mergeElectronicRecordDataIntoPrintRecord(printRecord, electronicRecordsToMergeIn);
+			} catch (JSONException e) {
+				ArrayList<String> electronicRecordClioIdentifiers = new ArrayList<String>();
+				for(DurstRecord record : electronicRecordsToMergeIn) {
+					electronicRecordClioIdentifiers.addAll(record.getClioIdentifiers());
+				}
+				DurstVoyagerHyacinthSync.logger.error("Problem encountered while merging electronic records " + StringUtils.join(electronicRecordClioIdentifiers, ",") + " into print record " + printRecord.getClioIdentifiers().get(0));
+				System.exit(DurstVoyagerHyacinthSync.EXIT_CODE_ERROR);
+			}
 			if(mergeError != null) {
 				mergeErrors.add(mergeError);
 			}
