@@ -116,14 +116,22 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 						}
 						printRecordOcolcValuesToRecords.get(value035).add(record);
 					}
-				}
-				
-				// Check to see if Hyacinth record exists for this Durst voyager
-				// record, based on CLIO id. If so, assign that PID to this
-				// record so that we do an UPDATE operation instead of CREATE.
-				String pid = HyacinthUtils.getPidForClioIdentifier(record.getClioIdentifiers().get(0));
-				if(pid != null) {
-					record.setPid(pid);
+					
+					// If this is a PRINT record, check to see if Hyacinth
+					// record exists for this Durst voyager record, based on
+					// CLIO id. If so, assign that PID to this record so that we
+					// do an UPDATE operation instead of CREATE.
+					// Note: We don't need to do this for electronic records
+					// because they're always merged into print records based on
+					// 035/776 matching, and we CAN'T do this for electronic
+					// records because the same electronic record could be
+					// merged into multiple print records, so we wouldn't know
+					// which pid to choose for a given electronic record.
+					String pid = HyacinthUtils.getPidForClioIdentifier(record.getClioIdentifiers().get(0));
+					if(pid != null) {
+						record.setPid(pid);
+					}
+					
 				}
 				
 			} catch (FileNotFoundException e) {
@@ -192,8 +200,6 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 			if(mergeError != null) {
 				mergeErrors.add(mergeError);
 			}
-			
-			finalizedRecordsToImport.add(printRecord);
 		}
 		
 		//Check for merge errors
