@@ -1,13 +1,14 @@
 package org.jafer.zclient;
 
+import java.util.Vector;
+
+import org.jafer.exception.JaferException;
 import org.jafer.record.DataObject;
 import org.jafer.record.TermRecord;
+import org.jafer.util.ConnectionException;
 import org.jafer.util.PDUDriver;
-import org.jafer.exception.JaferException;
-import java.util.Vector;
 import org.jafer.zclient.operations.PresentException;
 import org.w3c.dom.Node;
-import org.jafer.util.ConnectionException;
 
 public interface Session {
   public void close();

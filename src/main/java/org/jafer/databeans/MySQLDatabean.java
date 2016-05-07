@@ -28,16 +28,18 @@
 
 package org.jafer.databeans;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+
 import org.jafer.exception.JaferException;
 import org.jafer.query.XMLRPNQuery;
 import org.w3c.dom.Node;
-import java.util.logging.Level;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.SQLException;
-import z3950.v3.RPNQuery;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+
+import z3950.v3.RPNQuery;
 
 
 public class MySQLDatabean extends JDBC {

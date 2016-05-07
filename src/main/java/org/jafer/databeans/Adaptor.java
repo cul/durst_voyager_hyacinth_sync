@@ -21,11 +21,13 @@ package org.jafer.databeans;
 
 //import java.util.logging.Logger;
 //import java.util.logging.Level;
-import javax.xml.transform.*;
+import javax.xml.transform.Templates;
 
-import org.jafer.exception.*;
-import org.jafer.interfaces.*;
-import org.jafer.record.*;
+import org.jafer.exception.JaferException;
+import org.jafer.interfaces.Databean;
+import org.jafer.interfaces.Present;
+import org.jafer.interfaces.Search;
+import org.jafer.record.Field;
 
 /**
  * <p>Super class for adaptors, includes methods to set transforms via templates object and specify source and target schemas - configured via server.xml</p>

@@ -29,11 +29,19 @@
 
 package org.jafer.record;
 
-import asn1.*;
-import org.w3c.dom.*;
 import java.io.StringWriter;
-import org.jafer.util.xml.XMLSerializer;
+
 import org.jafer.exception.JaferException;
+import org.jafer.util.xml.XMLSerializer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import asn1.ASN1Any;
+import asn1.ASN1Exception;
+import asn1.ASN1External;
+import asn1.ASN1GeneralString;
+import asn1.BEREncoding;
 
 public class XMLRecord extends DataObject {
 

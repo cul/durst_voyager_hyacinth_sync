@@ -19,25 +19,22 @@
 
 package org.jafer.util;
 
-import org.jafer.util.ConnectionException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import asn1.ASN1Exception;
 import asn1.ASN1Integer;
 import asn1.BEREncoding;
-import z3950.v3.PDU;
 import z3950.v3.CloseReason;
-
-import java.util.TimerTask;
-import java.util.Timer;
+import z3950.v3.PDU;
 
 
 class KillSocketTask extends TimerTask {

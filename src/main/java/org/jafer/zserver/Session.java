@@ -19,23 +19,29 @@
 
 package org.jafer.zserver;
 
-import org.jafer.util.ConnectionException;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.logging.Level;
 
-import org.jafer.util.PDUDriver;
-import org.jafer.zserver.util.Lock;
-import org.jafer.zserver.operations.*;
+import org.jafer.exception.JaferException;
+import org.jafer.interfaces.Authenticate;
 import org.jafer.interfaces.Databean;
 import org.jafer.interfaces.DatabeanFactory;
-import org.jafer.interfaces.Authenticate;
-import org.jafer.exception.JaferException;
+import org.jafer.util.ConnectionException;
+import org.jafer.util.PDUDriver;
+import org.jafer.zserver.operations.Delete;
+import org.jafer.zserver.operations.Init;
+import org.jafer.zserver.operations.Present;
+import org.jafer.zserver.operations.Scan;
+import org.jafer.zserver.operations.Search;
+import org.jafer.zserver.operations.Sort;
+import org.jafer.zserver.util.Lock;
 
 import asn1.BEREncoding;
 import z3950.v3.PDU;
-
-import java.util.logging.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
 
 /**
  * <p>Sets up session and waits for request PDUs. Each new request is handled by relevant operation in a new thread.

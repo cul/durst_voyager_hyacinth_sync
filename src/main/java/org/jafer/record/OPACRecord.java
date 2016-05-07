@@ -31,14 +31,15 @@
 
 package org.jafer.record;
 
-import asn1.BEREncoding;
+import java.lang.reflect.Field;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import z3950.RS_opac.HoldingsRecord;
-import z3950.RS_opac.HoldingsAndCircData;
+
 import asn1.ASN1Any;
-import java.lang.reflect.Field;
+import asn1.BEREncoding;
+import z3950.RS_opac.HoldingsAndCircData;
+import z3950.RS_opac.HoldingsRecord;
 
 
 public class OPACRecord extends DataObject {

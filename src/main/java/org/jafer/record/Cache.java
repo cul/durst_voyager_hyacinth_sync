@@ -1,7 +1,7 @@
 package org.jafer.record;
 
-import org.w3c.dom.Document;
 import org.jafer.exception.JaferException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 public interface Cache {

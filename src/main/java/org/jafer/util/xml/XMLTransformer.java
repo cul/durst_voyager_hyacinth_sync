@@ -18,34 +18,35 @@
  */
 
 package org.jafer.util.xml;
-import org.jafer.exception.JaferException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URL;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
+
 //Imported TraX classes
 import javax.xml.transform.Result;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.Templates;
-// Imported DOM classes
-import org.w3c.dom.Node;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.jafer.exception.JaferException;
 // Imported Logger classes
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+// Imported DOM classes
+import org.w3c.dom.Node;
 
 /**
  * <p>Provides methods for transforming xml using a templates object or by specifying a file, or URL for the styleSheet.

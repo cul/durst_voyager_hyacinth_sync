@@ -17,7 +17,12 @@
 //----------------------------------------------------------------
 
 package z3950.v3;
-import asn1.*;
+import asn1.ASN1Any;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.ASN1Sequence;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 
 
 //================================================================

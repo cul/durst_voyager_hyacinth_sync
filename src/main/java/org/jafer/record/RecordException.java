@@ -11,9 +11,6 @@
 package org.jafer.record;
 import org.jafer.exception.JaferException;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-
 public class RecordException extends JaferException{
 
   private Field field;

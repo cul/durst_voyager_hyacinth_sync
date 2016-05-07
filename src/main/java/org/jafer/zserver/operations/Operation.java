@@ -19,25 +19,24 @@
 
 package org.jafer.zserver.operations;
 
-import org.jafer.util.PDUDriver;
-import org.jafer.zserver.ZServerThread;
-import org.jafer.zserver.Session;
+import java.util.logging.Level;
+
 import org.jafer.conf.Config;
 import org.jafer.util.ConnectionException;
-import org.jafer.zserver.operations.OperationException;
+import org.jafer.util.PDUDriver;
+import org.jafer.zserver.Session;
+import org.jafer.zserver.ZServerThread;
 
-import z3950.v3.PDU;
-import z3950.v3.DiagRec;
-import z3950.v3.NamePlusRecord_record;
+import asn1.ASN1GeneralString;
+import asn1.ASN1Integer;
+import asn1.ASN1ObjectIdentifier;
+import asn1.ASN1VisibleString;
 import z3950.v3.DefaultDiagFormat;
 import z3950.v3.DefaultDiagFormat_addinfo;
+import z3950.v3.DiagRec;
 import z3950.v3.InternationalString;
-import asn1.ASN1GeneralString;
-import asn1.ASN1VisibleString;
-import asn1.ASN1ObjectIdentifier;
-import asn1.ASN1Integer;
-
-import java.util.logging.Level;
+import z3950.v3.NamePlusRecord_record;
+import z3950.v3.PDU;
 
 /**
  * <p>Each operation runs in it's own thread and either terminates naturally by sending response PDU (or Diagnostic) or can be stopped by session which forces close of socket.

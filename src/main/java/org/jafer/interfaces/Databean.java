@@ -31,13 +31,10 @@
 
 package org.jafer.interfaces;
 
-import z3950.v3.RPNQuery;
-import asn1.ASN1External;
-import org.jafer.exception.JaferException;
-import org.jafer.record.Field;
-import org.w3c.dom.Node;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * Interface for implementing a Databean

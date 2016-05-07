@@ -20,16 +20,13 @@
  */
 
 package org.jafer.record;
-import org.jafer.util.xml.DOMFactory;
-//import org.jafer.util.Bib1DiagMessages;
-
-import asn1.BEREncoding;
-import asn1.ASN1Exception;
-import z3950.v3.TermInfo;
-
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import asn1.ASN1Exception;
+import asn1.BEREncoding;
+import z3950.v3.TermInfo;
 
 public class TermRecord extends DataObject {
 

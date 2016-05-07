@@ -29,15 +29,14 @@
 
 package org.jafer.query;
 
-import org.jafer.zclient.ZClient;
-import org.jafer.conf.Config;
-import org.jafer.util.xml.DOMFactory;
-import org.jafer.exception.JaferException;
-
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.Hashtable;
 
+import javax.xml.validation.Schema;
+
+import org.jafer.conf.Config;
+import org.jafer.exception.JaferException;
+import org.jafer.util.xml.DOMFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

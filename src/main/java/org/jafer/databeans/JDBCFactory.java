@@ -28,9 +28,9 @@
 
 package org.jafer.databeans;
 
+import org.jafer.interfaces.Databean;
 import org.jafer.interfaces.DatabeanFactory;
 import org.jafer.interfaces.Z3950Connection;
-import org.jafer.interfaces.Databean;
 
 public class JDBCFactory extends DatabeanFactory implements Z3950Connection {
 

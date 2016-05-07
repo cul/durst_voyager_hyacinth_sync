@@ -30,19 +30,18 @@
 
 package org.jafer.databeans;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.jafer.exception.JaferException;
 import org.jafer.interfaces.Databean;
 import org.jafer.interfaces.DatabeanFactory;
-import org.jafer.exception.JaferException;
 import org.jafer.interfaces.Present;
 import org.jafer.interfaces.Search;
 import org.jafer.record.Field;
 import org.jafer.util.xml.DOMFactory;
-
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import org.w3c.dom.Node;
 
 

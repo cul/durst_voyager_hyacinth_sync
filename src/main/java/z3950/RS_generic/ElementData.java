@@ -17,12 +17,21 @@
 //----------------------------------------------------------------
 
 package z3950.RS_generic;
-import asn1.*;
+import asn1.ASN1Any;
+import asn1.ASN1Boolean;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.ASN1External;
+import asn1.ASN1GeneralizedTime;
+import asn1.ASN1Integer;
+import asn1.ASN1Null;
+import asn1.ASN1ObjectIdentifier;
+import asn1.ASN1OctetString;
+import asn1.ASN1Sequence;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 import z3950.v3.IntUnit;
 import z3950.v3.InternationalString;
-import z3950.v3.StringOrNumeric;
-import z3950.v3.Term;
-import z3950.v3.Unit;
 
 //================================================================
 /**

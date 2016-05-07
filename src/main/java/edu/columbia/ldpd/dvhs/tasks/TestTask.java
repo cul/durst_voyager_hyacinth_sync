@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.json.JSONException;
 
-import edu.columbia.ldpd.dvhs.DurstVoyagerHyacinthSync;
 import edu.columbia.ldpd.dvhs.exceptions.MultipleRecordsException;
 import edu.columbia.ldpd.dvhs.utils.HyacinthUtils;
 

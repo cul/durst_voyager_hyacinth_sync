@@ -31,19 +31,32 @@
 
 package org.jafer.zclient.operations;
 
+import org.jafer.exception.JaferException;
+import org.jafer.query.QueryException;
+import org.jafer.query.XMLRPNQuery;
+import org.jafer.record.Diagnostic;
 import org.jafer.util.ConnectionException;
 import org.jafer.util.PDUDriver;
-import org.jafer.record.Diagnostic;
-import org.jafer.query.XMLRPNQuery;
-import org.jafer.query.QueryException;
-import org.jafer.exception.JaferException;
-
-import org.w3c.dom.Node;
-import z3950.v3.*;
-import asn1.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+
+import asn1.ASN1Any;
+import asn1.ASN1Boolean;
+import asn1.ASN1Exception;
+import asn1.ASN1GeneralString;
+import asn1.ASN1Integer;
+import asn1.ASN1OctetString;
+import asn1.ASN1Sequence;
+import z3950.v3.DatabaseName;
+import z3950.v3.InternationalString;
+import z3950.v3.OtherInformation1;
+import z3950.v3.PDU;
+import z3950.v3.Query;
+import z3950.v3.RPNQuery;
+import z3950.v3.ReferenceId;
+import z3950.v3.SearchRequest;
+import z3950.v3.SearchResponse;
 
 public class Search {
 

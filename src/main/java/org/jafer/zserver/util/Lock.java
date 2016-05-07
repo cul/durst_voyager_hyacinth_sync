@@ -26,7 +26,8 @@ package org.jafer.zserver.util;
  * @author Antony Corfield; Matthew Dovey; Colin Tatham
  * @version 1.0
  */
-import java.util.*;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class Lock {
   private Vector waiting;

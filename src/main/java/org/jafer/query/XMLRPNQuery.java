@@ -29,15 +29,30 @@
 
 package org.jafer.query;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.xpath.CachedXPathAPI;
 import org.jafer.conf.Config;
 import org.jafer.exception.JaferException;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import z3950.v3.*;
-import asn1.*;
-import org.apache.xpath.CachedXPathAPI;
+
+import asn1.ASN1Integer;
+import asn1.ASN1Null;
+import asn1.ASN1ObjectIdentifier;
+import asn1.ASN1OctetString;
+import z3950.v3.AttributeElement;
+import z3950.v3.AttributeElement_attributeValue;
+import z3950.v3.AttributeList;
+import z3950.v3.AttributeSetId;
+import z3950.v3.AttributesPlusTerm;
+import z3950.v3.Operand;
+import z3950.v3.Operator;
+import z3950.v3.RPNQuery;
+import z3950.v3.RPNStructure;
+import z3950.v3.RPNStructure_rpnRpnOp;
+import z3950.v3.Term;
 
 public class XMLRPNQuery {
 

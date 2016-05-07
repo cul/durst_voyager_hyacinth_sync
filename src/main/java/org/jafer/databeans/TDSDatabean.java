@@ -32,12 +32,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import net.sourceforge.jtds.jdbcx.JtdsDataSource;
-
 import org.jafer.exception.JaferException;
 import org.jafer.query.XMLRPNQuery;
 import org.w3c.dom.Node;
 
+import net.sourceforge.jtds.jdbcx.JtdsDataSource;
 import z3950.v3.RPNQuery;
 
 public class TDSDatabean extends JDBC {

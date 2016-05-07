@@ -19,20 +19,27 @@
 
 package org.jafer.zserver.operations;
 
-import org.jafer.zserver.Session;
-import org.jafer.interfaces.Databean;
-import org.jafer.query.XMLRPNQuery;
 import org.jafer.conf.Config;
-import org.jafer.query.QueryException;
 import org.jafer.exception.JaferException;
-import org.jafer.zserver.operations.OperationException;
+import org.jafer.zserver.Session;
 
-import java.util.logging.Level;
-
-import org.w3c.dom.Node;
-
-import z3950.v3.*;
-import asn1.*;
+import asn1.ASN1Any;
+import asn1.ASN1Boolean;
+import asn1.ASN1External;
+import asn1.ASN1GeneralString;
+import asn1.ASN1Integer;
+import asn1.ASN1Sequence;
+import z3950.v3.DatabaseName;
+import z3950.v3.DefaultDiagFormat;
+import z3950.v3.InternationalString;
+import z3950.v3.OtherInformation;
+import z3950.v3.OtherInformation1;
+import z3950.v3.OtherInformation_information;
+import z3950.v3.PDU;
+import z3950.v3.PresentStatus;
+import z3950.v3.RPNQuery;
+import z3950.v3.Records;
+import z3950.v3.SearchResponse;
 
 /**
  * <p>Runs a Z39.50 search on database(s) - resultSets stored in associated Session.

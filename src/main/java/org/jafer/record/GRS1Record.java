@@ -31,34 +31,29 @@
 
 package org.jafer.record;
 
-import org.jafer.record.DataObject;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.jafer.conf.Config;
-import org.jafer.util.xml.DOMFactory;
-
-import asn1.BEREncoding;
-import asn1.ASN1External;
-import asn1.ASN1Exception;
-import asn1.ASN1Integer;
-import asn1.ASN1GeneralString;
-import asn1.ASN1ObjectIdentifier;
-import asn1.ASN1Boolean;
-import asn1.ASN1GeneralizedTime;
-
-import z3950.RS_generic.GenericRecord;
-import z3950.RS_generic.TaggedElement;
-import z3950.RS_generic.ElementData;
-import z3950.v3.StringOrNumeric;
-import z3950.v3.InternationalString;
-import z3950.v3.IntUnit;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Vector;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
+import asn1.ASN1Boolean;
+import asn1.ASN1Exception;
+import asn1.ASN1External;
+import asn1.ASN1GeneralString;
+import asn1.ASN1GeneralizedTime;
+import asn1.ASN1Integer;
+import asn1.ASN1ObjectIdentifier;
+import asn1.BEREncoding;
+import z3950.RS_generic.ElementData;
+import z3950.RS_generic.GenericRecord;
+import z3950.RS_generic.TaggedElement;
+import z3950.v3.IntUnit;
+import z3950.v3.InternationalString;
+import z3950.v3.StringOrNumeric;
 
 public class GRS1Record extends DataObject {
 

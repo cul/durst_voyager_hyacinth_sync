@@ -31,7 +31,6 @@
 
 package org.jafer.util;
 
-import org.jafer.zclient.operations.*;
 import org.jafer.exception.JaferException;
 /**
  * Exception thrown if problems connecting to server

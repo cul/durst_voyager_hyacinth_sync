@@ -1,5 +1,11 @@
 package org.jafer.interfaces;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.URL;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -9,8 +15,6 @@ package org.jafer.interfaces;
  * @version 1.0
  */
 import org.jafer.conf.CompressedXMLDecoder;
-import java.net.URL;
-import java.io.*;
 
 public abstract class Authenticate implements Serializable {
   abstract public boolean authenticate(String username, String groupname, String password, String clientIp);

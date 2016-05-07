@@ -11,7 +11,7 @@
 
 package asn1;
 
-import java.io.*;
+import java.io.OutputStream;
 
 //----------------------------------------------------------------
 /**

@@ -17,7 +17,11 @@
 //----------------------------------------------------------------
 
 package z3950.ESFormat_CIPOrder;
-import asn1.*;
+import asn1.ASN1Any;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 import z3950.v3.InternationalString;
 import z3950.v3.OtherInformation;
 

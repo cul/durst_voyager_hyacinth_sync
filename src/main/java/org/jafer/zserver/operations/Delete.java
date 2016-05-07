@@ -32,19 +32,18 @@
 
 package org.jafer.zserver.operations;
 
-import org.jafer.util.ConnectionException;
+import java.util.logging.Level;
 
-import org.jafer.util.PDUDriver;
-import org.jafer.zserver.*;
+import org.jafer.exception.JaferException;
+import org.jafer.zserver.Session;
 
-import java.net.*;
-import java.util.*;
-import java.io.*;
-import java.util.logging.*;
-import z3950.v3.*;
-import asn1.*;
-import z3950.RS_SUTRS.*;
-import org.jafer.exception.*;
+import asn1.ASN1Integer;
+import z3950.v3.DeleteResultSetResponse;
+import z3950.v3.DeleteSetStatus;
+import z3950.v3.ListStatuses;
+import z3950.v3.ListStatuses1;
+import z3950.v3.PDU;
+import z3950.v3.ResultSetId;
 
 public class Delete extends Operation {
 

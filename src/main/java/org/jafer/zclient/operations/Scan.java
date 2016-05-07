@@ -30,15 +30,14 @@
  */
 package org.jafer.zclient.operations;
 
-import org.jafer.util.ConnectionException;
-
-import org.jafer.exception.JaferException;
-import org.jafer.util.PDUDriver;
-import org.jafer.conf.Config;
-import org.jafer.record.TermRecord;
-import org.jafer.query.XMLRPNQuery;
-
 import java.util.Vector;
+
+import org.jafer.conf.Config;
+import org.jafer.exception.JaferException;
+import org.jafer.query.XMLRPNQuery;
+import org.jafer.record.TermRecord;
+import org.jafer.util.ConnectionException;
+import org.jafer.util.PDUDriver;
 import org.w3c.dom.Node;
 
 import asn1.ASN1GeneralString;

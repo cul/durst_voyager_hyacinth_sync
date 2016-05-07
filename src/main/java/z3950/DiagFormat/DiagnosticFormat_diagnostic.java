@@ -17,14 +17,12 @@
 //----------------------------------------------------------------
 
 package z3950.DiagFormat;
-import asn1.*;
-import z3950.v3.AttributeList;
-import z3950.v3.DatabaseName;
+import asn1.ASN1Any;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 import z3950.v3.DefaultDiagFormat;
-import z3950.v3.InternationalString;
-import z3950.v3.SortElement;
-import z3950.v3.Specification;
-import z3950.v3.Term;
 
 //================================================================
 /**

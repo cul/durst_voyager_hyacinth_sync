@@ -30,15 +30,13 @@
  */
 
 package org.jafer.record;
-import org.jafer.util.xml.DOMFactory;
 import org.jafer.conf.Config;
-
-import asn1.BEREncoding;
-import asn1.ASN1Exception;
-import z3950.v3.DefaultDiagFormat;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import asn1.ASN1Exception;
+import asn1.BEREncoding;
+import z3950.v3.DefaultDiagFormat;
 
 public class Diagnostic extends DataObject {
 

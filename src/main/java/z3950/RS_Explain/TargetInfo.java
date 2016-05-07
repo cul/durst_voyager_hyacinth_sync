@@ -17,19 +17,16 @@
 //----------------------------------------------------------------
 
 package z3950.RS_Explain;
-import asn1.*;
-import z3950.v3.AttributeElement;
-import z3950.v3.AttributeList;
-import z3950.v3.AttributeSetId;
-import z3950.v3.DatabaseName;
-import z3950.v3.ElementSetName;
+import asn1.ASN1Any;
+import asn1.ASN1Boolean;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.ASN1Integer;
+import asn1.ASN1Sequence;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 import z3950.v3.IntUnit;
 import z3950.v3.InternationalString;
-import z3950.v3.OtherInformation;
-import z3950.v3.Specification;
-import z3950.v3.StringOrNumeric;
-import z3950.v3.Term;
-import z3950.v3.Unit;
 
 //================================================================
 /**

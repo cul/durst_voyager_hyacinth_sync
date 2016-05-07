@@ -32,9 +32,6 @@
 
 package org.jafer.record;
 
-import org.jafer.record.RecordFactory;
-import org.jafer.record.DataObject;
-
 import java.util.Hashtable;
 
 import org.w3c.dom.Node;

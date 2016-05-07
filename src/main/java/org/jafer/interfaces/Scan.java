@@ -31,7 +31,6 @@
 
 package org.jafer.interfaces;
 
-import org.jafer.exception.JaferException;
 import org.jafer.record.Field;
 import org.w3c.dom.Node;
 

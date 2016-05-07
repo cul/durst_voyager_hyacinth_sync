@@ -32,20 +32,30 @@
 
 package org.jafer.zserver.operations;
 
-import org.jafer.util.ConnectionException;
+import java.util.logging.Level;
 
-import org.jafer.util.PDUDriver;
 import org.jafer.conf.Config;
 import org.jafer.exception.JaferException;
-import org.jafer.record.*;
-import org.jafer.util.xml.*;
+import org.jafer.record.DataObject;
+import org.jafer.record.RecordFactory;
+import org.jafer.util.xml.DOMFactory;
 import org.jafer.zserver.Session;
+import org.w3c.dom.Node;
 
-import java.util.logging.*;
-
-import org.w3c.dom.*;
-import z3950.v3.*;
-import asn1.*;
+import asn1.ASN1Exception;
+import asn1.ASN1External;
+import asn1.ASN1GeneralString;
+import asn1.ASN1Integer;
+import asn1.BEREncoding;
+import z3950.v3.DatabaseName;
+import z3950.v3.DefaultDiagFormat;
+import z3950.v3.InternationalString;
+import z3950.v3.NamePlusRecord;
+import z3950.v3.NamePlusRecord_record;
+import z3950.v3.PDU;
+import z3950.v3.PresentResponse;
+import z3950.v3.PresentStatus;
+import z3950.v3.Records;
 
 /**
  * <p>Runs a Z39.50 Present on requested resultSet stored in associated Session.

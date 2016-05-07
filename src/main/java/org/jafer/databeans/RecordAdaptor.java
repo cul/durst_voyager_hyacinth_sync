@@ -21,11 +21,12 @@ package org.jafer.databeans;
 
 //import java.util.logging.Logger;
 //import java.util.logging.Level;
-import org.jafer.exception.*;
-import org.jafer.interfaces.*;
-import org.jafer.record.*;
-import org.jafer.util.xml.*;
-import org.w3c.dom.*;
+import org.jafer.exception.JaferException;
+import org.jafer.interfaces.Present;
+import org.jafer.record.Field;
+import org.jafer.util.xml.XMLTransformer;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * <p>transforms a record via getCurrentRecord method using templates object (eg. recordAdaptor.xsl - specified via server.xml).

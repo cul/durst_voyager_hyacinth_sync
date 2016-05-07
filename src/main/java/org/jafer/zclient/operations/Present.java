@@ -31,19 +31,28 @@
 
 package org.jafer.zclient.operations;
 
-import org.jafer.util.ConnectionException;
+import java.util.Vector;
 
-import org.jafer.util.PDUDriver;
 import org.jafer.record.DataObject;
 import org.jafer.record.Diagnostic;
-
+import org.jafer.util.ConnectionException;
+import org.jafer.util.PDUDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Vector;
-
-import z3950.v3.*;
-import asn1.*;
+import asn1.ASN1Exception;
+import asn1.ASN1GeneralString;
+import asn1.ASN1Integer;
+import asn1.ASN1ObjectIdentifier;
+import z3950.v3.ElementSetNames;
+import z3950.v3.InternationalString;
+import z3950.v3.NamePlusRecord;
+import z3950.v3.PDU;
+import z3950.v3.PresentRequest;
+import z3950.v3.PresentRequest_recordComposition;
+import z3950.v3.PresentResponse;
+import z3950.v3.PresentStatus;
+import z3950.v3.ResultSetId;
 
 public class Present {
 

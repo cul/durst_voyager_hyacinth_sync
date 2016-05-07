@@ -28,25 +28,37 @@
 
 package org.jafer.databeans;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
+import java.io.StringWriter;
+import java.net.URL;
 import java.sql.Connection;
-import java.util.*;
-import java.util.logging.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.sql.*;
-import javax.xml.transform.*;
+import javax.sql.DataSource;
+import javax.xml.transform.TransformerException;
 
-import org.apache.xpath.*;
-import org.jafer.conf.*;
-import org.jafer.exception.*;
-import org.jafer.interfaces.*;
-import org.jafer.record.*;
+import org.apache.xpath.CachedXPathAPI;
+import org.apache.xpath.NodeSet;
+import org.jafer.conf.Config;
+import org.jafer.exception.JaferException;
+import org.jafer.interfaces.Databean;
+import org.jafer.interfaces.Present;
+import org.jafer.interfaces.Search;
+import org.jafer.interfaces.Z3950Connection;
 import org.jafer.query.XMLRPNQuery;
-import org.jafer.util.xml.*;
-
-import org.w3c.dom.*;
+import org.jafer.record.Field;
+import org.jafer.util.xml.DOMFactory;
+import org.jafer.util.xml.XMLSerializer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import z3950.v3.RPNQuery;
 

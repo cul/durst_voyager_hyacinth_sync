@@ -18,8 +18,13 @@
 
 package z3950.AccessCtrl_krb;
 
-import asn1.*;
-
+import asn1.ASN1Any;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.ASN1OctetString;
+import asn1.ASN1Sequence;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 import z3950.v3.InternationalString;
 
 //================================================================

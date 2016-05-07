@@ -31,9 +31,10 @@
 
 package org.jafer.databeans;
 
+import java.util.Hashtable;
+
 import org.jafer.interfaces.Databean;
 import org.jafer.interfaces.DatabeanFactory;
-import java.util.Hashtable;
 
 
 public class DatabeanManagerFactory extends DatabeanFactory {

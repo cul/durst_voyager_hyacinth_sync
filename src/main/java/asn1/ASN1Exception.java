@@ -21,6 +21,7 @@ package asn1;
 
 //----------------------------------------------------------------
 
+@SuppressWarnings("serial")
 public class ASN1Exception extends Exception
 {
   public ASN1Exception()

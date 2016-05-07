@@ -30,12 +30,14 @@
 
 package org.jafer.databeans;
 
-import org.jafer.interfaces.DatabeanFactory;
-import org.jafer.interfaces.Databean;
-import org.jafer.exception.JaferException;
-import org.jafer.util.xml.XMLTransformer;
-import javax.xml.transform.Templates;
 import java.net.URL;
+
+import javax.xml.transform.Templates;
+
+import org.jafer.exception.JaferException;
+import org.jafer.interfaces.Databean;
+import org.jafer.interfaces.DatabeanFactory;
+import org.jafer.util.xml.XMLTransformer;
 
 abstract public class AdaptorFactory extends DatabeanFactory {
 

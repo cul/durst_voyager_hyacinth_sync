@@ -17,8 +17,12 @@
 //----------------------------------------------------------------
 
 package z3950.ESFormat_CIP2_4Order;
-import asn1.*;
-import z3950.v3.InternationalString;
+import asn1.ASN1Any;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.ASN1External;
+import asn1.ASN1Null;
+import asn1.BEREncoding;
 
 //================================================================
 /**

@@ -17,8 +17,13 @@
 //----------------------------------------------------------------
 
 package z3950.ESFormat_Update;
-import asn1.*;
-import z3950.v3.DiagRec;
+import asn1.ASN1Any;
+import asn1.ASN1EncodingException;
+import asn1.ASN1Exception;
+import asn1.ASN1Integer;
+import asn1.ASN1Sequence;
+import asn1.BERConstructed;
+import asn1.BEREncoding;
 import z3950.v3.InternationalString;
 
 //================================================================

@@ -19,16 +19,17 @@
 
 package org.jafer.databeans;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jafer.exception.JaferException;
 import org.jafer.interfaces.Search;
 import org.jafer.query.XMLRPNQuery;
 import org.jafer.util.xml.DOMFactory;
 import org.jafer.util.xml.XMLTransformer;
-import org.w3c.dom.Node;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import z3950.v3.RPNQuery;
 
 /**

@@ -18,25 +18,22 @@
  */
 
 package org.jafer.record;
-import org.jafer.exception.JaferException;
-
-import org.jafer.conf.Config;
-import org.jafer.util.xml.DOMFactory;
-import org.jafer.util.xml.XMLTransformer;
-
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
-import java.net.URL;
-import java.lang.reflect.Constructor;
-//imported exceptions for instantiating a Record class
-import java.lang.ClassNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.xml.transform.Templates;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
+
+import org.jafer.conf.Config;
+import org.jafer.exception.JaferException;
+import org.jafer.util.xml.DOMFactory;
+import org.jafer.util.xml.XMLTransformer;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import asn1.BEREncoding;
 

@@ -31,9 +31,15 @@
 
 package org.jafer.record;
 
-import asn1.*;
-import org.w3c.dom.*;
-import z3950.RS_SUTRS.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import asn1.ASN1Exception;
+import asn1.ASN1External;
+import asn1.ASN1GeneralString;
+import asn1.BEREncoding;
+import z3950.RS_SUTRS.SutrsRecord;
 
 
 public class SUTRSRecord extends DataObject {

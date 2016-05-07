@@ -22,11 +22,18 @@ package org.jafer.zserver.operations;
 import org.jafer.conf.Config;
 import org.jafer.zserver.Session;
 
-import java.util.logging.Level;
-
-import z3950.RS_SUTRS.*;
-import z3950.v3.*;
-import asn1.*;
+import asn1.ASN1Any;
+import asn1.ASN1BitString;
+import asn1.ASN1Boolean;
+import asn1.ASN1External;
+import asn1.ASN1GeneralString;
+import asn1.ASN1ObjectIdentifier;
+import z3950.RS_SUTRS.SutrsRecord;
+import z3950.v3.InitializeResponse;
+import z3950.v3.InternationalString;
+import z3950.v3.Options;
+import z3950.v3.PDU;
+import z3950.v3.ProtocolVersion;
 
 /**
  * <p>Checks/sets authentication and concurrent operations if requested by client</p>

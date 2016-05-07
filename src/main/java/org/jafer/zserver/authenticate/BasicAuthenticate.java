@@ -19,11 +19,10 @@
 
 package org.jafer.zserver.authenticate;
 
-import org.jafer.conf.Config;
-import org.jafer.interfaces.*;
+import java.util.Hashtable;
 
-import java.io.*;
-import java.util.*;
+import org.jafer.conf.Config;
+import org.jafer.interfaces.Authenticate;
 
 /**
  * <p>Provides basic authentication via org.jafer.zserver.operations.Init operation within a session.

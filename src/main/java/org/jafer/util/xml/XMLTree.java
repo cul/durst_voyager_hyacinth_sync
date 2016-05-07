@@ -31,16 +31,17 @@
 
 package org.jafer.util.xml;
 
-import org.w3c.dom.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Vector;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
+import org.w3c.dom.Node;
 
   public class XMLTree extends JFrame {
 

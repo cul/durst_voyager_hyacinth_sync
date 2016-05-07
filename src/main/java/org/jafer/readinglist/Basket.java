@@ -30,16 +30,14 @@
 
 package org.jafer.readinglist;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Enumeration;
-import java.io.*;
 
-import org.w3c.dom.*;
-
+import org.jafer.exception.JaferException;
 import org.jafer.record.Field;
 import org.jafer.util.xml.XMLSerializer;
-import org.jafer.exception.JaferException;
+import org.w3c.dom.Node;
 
 public class Basket {
 

@@ -1,5 +1,9 @@
 package org.jafer.conf;
 
+import java.beans.XMLDecoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -11,14 +15,12 @@ package org.jafer.conf;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.beans.XMLDecoder;
+
+import org.jafer.util.xml.DOMFactory;
+import org.jafer.util.xml.XMLSerializer;
+import org.jafer.util.xml.XMLTransformer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.jafer.util.xml.DOMFactory;
-import org.jafer.util.xml.XMLTransformer;
-import java.io.ByteArrayOutputStream;
-import org.jafer.util.xml.XMLSerializer;
-import java.io.ByteArrayInputStream;
 
 public class CompressedXMLDecoder {
   private InputStream in;

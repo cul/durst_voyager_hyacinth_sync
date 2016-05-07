@@ -19,10 +19,6 @@
 
 package org.jafer.conf;
 
-import org.jafer.exception.JaferException;
-import org.jafer.util.xml.DOMFactory;
-import org.jafer.util.xml.XMLTransformer;
-
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -32,6 +28,9 @@ import javax.xml.transform.Templates;
 
 import org.apache.xpath.CachedXPathAPI;
 import org.bouncycastle.util.Arrays;
+import org.jafer.exception.JaferException;
+import org.jafer.util.xml.DOMFactory;
+import org.jafer.util.xml.XMLTransformer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

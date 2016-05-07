@@ -29,14 +29,14 @@
 
 package org.jafer.query;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.xpath.CachedXPathAPI;
 import org.jafer.conf.Config;
 import org.jafer.exception.JaferException;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.apache.xpath.CachedXPathAPI;
-import org.w3c.dom.*;
 
 public class XMLCQLQuery {
 

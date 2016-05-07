@@ -1,9 +1,12 @@
 package org.jafer.interfaces;
 
-import java.rmi.RemoteException;
-import org.jafer.conf.CompressedXMLDecoder;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URL;
-import java.io.*;
+
+import org.jafer.conf.CompressedXMLDecoder;
 
 /**
  * Title:

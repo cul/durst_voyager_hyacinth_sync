@@ -32,14 +32,20 @@
 package org.jafer.zclient.operations;
 
 import org.jafer.util.ConnectionException;
-import org.jafer.zclient.Session;
 import org.jafer.util.PDUDriver;
+import org.jafer.zclient.Session;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
-import z3950.v3.*;
-import asn1.*;
+import asn1.ASN1BitString;
+import asn1.ASN1GeneralString;
+import asn1.ASN1Integer;
+import z3950.v3.IdAuthentication;
+import z3950.v3.IdAuthentication_idPass;
+import z3950.v3.InitializeRequest;
+import z3950.v3.InitializeResponse;
+import z3950.v3.InternationalString;
+import z3950.v3.Options;
+import z3950.v3.PDU;
+import z3950.v3.ProtocolVersion;
 
 public class Init {
 

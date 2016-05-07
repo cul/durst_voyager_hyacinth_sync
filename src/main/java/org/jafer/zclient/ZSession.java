@@ -31,22 +31,23 @@
 
 package org.jafer.zclient;
 
-import org.jafer.util.ConnectionException;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Vector;
 
 import org.jafer.exception.JaferException;
-import org.jafer.zclient.operations.*;
-import org.jafer.util.PDUDriver;
 import org.jafer.record.DataObject;
 import org.jafer.record.TermRecord;
-
+import org.jafer.util.ConnectionException;
+import org.jafer.util.PDUDriver;
+import org.jafer.zclient.operations.Init;
+import org.jafer.zclient.operations.Present;
+import org.jafer.zclient.operations.PresentException;
+import org.jafer.zclient.operations.Scan;
+import org.jafer.zclient.operations.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Vector;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.InetSocketAddress;
-
 import org.w3c.dom.Node;
 
 

@@ -21,18 +21,9 @@
 
 package org.jafer.zserver.operations;
 
-import org.jafer.util.ConnectionException;
+import org.jafer.zserver.Session;
 
-import org.jafer.util.PDUDriver;
-import org.jafer.zserver.*;
-
-import java.net.*;
-import java.util.*;
-import java.io.*;
-import java.util.logging.*;
-
-import z3950.v3.*;
-import asn1.*;
+import z3950.v3.PDU;
 
 
 /**
