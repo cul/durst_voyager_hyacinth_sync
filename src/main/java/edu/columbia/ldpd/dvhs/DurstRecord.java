@@ -28,12 +28,14 @@ public class DurstRecord {
 	
 	private JSONObject digitalObjectData;
 	private JSONObject dynamicFieldData;
-	private ArrayList<String> ocolc035FieldValues;
-	private HashSet<String> ocolc776FieldValues;
+	private ArrayList<String> ocolc035FieldValues = new ArrayList<String>();
+	private HashSet<String> ocolc776FieldValues = new HashSet<String>();
 	private boolean isElectronicRecord = false; //true when 965 $a field == "eDurst"
 	private String pid = null;
 	
 	public DurstRecord(File marcXmlFile, File[] holdingsFiles, String[] barcodes) {
+		
+		//Note: bacodes are not currently used
 		
 		this.digitalObjectData = new JSONObject();
 		this.dynamicFieldData = new JSONObject();
@@ -59,7 +61,6 @@ public class DurstRecord {
 					// This is an electronic record
 					this.isElectronicRecord = true;
 					ocolc776FieldValues = getOcolc776ValuesFromMarcRecord(bibMarcRecord);
-					
 				} else {
 					// This is a print record
 					this.isElectronicRecord = false;
@@ -68,7 +69,10 @@ public class DurstRecord {
 				
 				addHardCodedFieldValues();
 				extractMarcDataFromBibRecord(bibMarcRecord);
-				extractDataFromRawMarcHoldingsRecords(holdingsFiles);
+				
+				if(holdingsFiles != null) {
+					extractDataFromRawMarcHoldingsRecords(holdingsFiles);
+				}
 			}
 			
 			// Close marc file input stream
@@ -1385,7 +1389,12 @@ public class DurstRecord {
 			
 			// Merge in 776 values from electronic records and make the list unique
 			// Note: We can just get the value from the first electronic records
-			printRecord.ocolc776FieldValues.addAll(electronicRecord.getOcolc776FieldValues());
+			printRecord
+				.ocolc776FieldValues
+					.addAll(
+						electronicRecord
+							.getOcolc776FieldValues()
+					);
 			
 			// Add electronic record CLIO identifiers
 			if(! printRecord.dynamicFieldData.has("clio_identifier")) {
