@@ -24,13 +24,13 @@ public class VoyagerToHyacinthWorker implements Runnable {
 	@Override
 	public void run() {
 		try {
-			if(HyacinthUtils.recordHasSpecificMarc005Value(record.getPid(), record.getMarc005Value())) {
-				// Skipping record update because this record hasn't changed (based on marc005 value)
-				DurstVoyagerHyacinthSync.logger.info("Skipping " + record.getPid() + " update because 005 value is unchanged.");
-			} else {
+			if(DurstVoyagerHyacinthSync.forceUpdateAllRecords || ! HyacinthUtils.recordHasSpecificMarc005Value(record.getPid(), record.getMarc005Value())) {
 				// Perform record update
 				DurstVoyagerHyacinthSync.logger.info("Sending " + (record.getPid() == null ? "new record" : ("record with pid=" + record.getPid())) + " to Hyacinth. (" + jobNumber +  " of " + totalNumberOfJobs + ")");
 				HyacinthUtils.sendDurstRecordToHyacinth(this.record, DurstVoyagerHyacinthSync.publishAfterSave, DurstVoyagerHyacinthSync.doTestSaveOnly);
+			} else {
+				// Skipping record update because this record hasn't changed (based on marc005 value)
+				DurstVoyagerHyacinthSync.logger.info("Skipping " + record.getPid() + " update because 005 value is unchanged.");
 			}
 		} catch (JSONException | IOException e) {
 			DurstVoyagerHyacinthSync.logger.error(e.getClass().getName() + " for record with pid " + record.getPid() + " and clio identifiers " + StringUtils.join(record.getClioIdentifiers(), ",") + ": " + e.getMessage() + "\n" + StringUtils.join(e.getStackTrace(), "\n"));

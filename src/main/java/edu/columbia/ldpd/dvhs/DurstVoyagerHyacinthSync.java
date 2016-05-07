@@ -47,6 +47,7 @@ public class DurstVoyagerHyacinthSync {
 	public static boolean reuseLatestDownloadedVoyagerData;
 	public static boolean publishAfterSave;
 	public static boolean doTestSaveOnly;
+	public static boolean forceUpdateAllRecords;
 	
 	public static boolean runTaskVoyagerToHyacinth;
 	public static boolean runTaskVoyagerConnectionTest;
@@ -123,6 +124,8 @@ public class DurstVoyagerHyacinthSync {
 				"Publish records after saving them in Hyacinth (applies to the Voyager to Hyacinth sync task).");
 		options.addOption("do_test_save_only", false,
 				"Send the test param when saving Hyacinth records so that they're not actually saved (applies to the Voyager to Hyacinth sync task).");
+		options.addOption("force_update_all_records", false,
+				"Update all records, regardless of whether their MARC 005 value has changed (applies to the Voyager to Hyacinth sync task).");
 		// Task options
 		options.addOption("run_task_voyager_to_hyacinth", false,
 				"Process site data from Voyager (and related hosts file) and save it to Hyacinth.");
@@ -160,6 +163,7 @@ public class DurstVoyagerHyacinthSync {
 				DurstVoyagerHyacinthSync.voyagerOracleDBPassword = cmdLine.getOptionValue("voyager_oracle_db_password", null);
 				
 				DurstVoyagerHyacinthSync.reuseLatestDownloadedVoyagerData = cmdLine.hasOption("reuse_latest_downloaded_marc_data");
+				DurstVoyagerHyacinthSync.forceUpdateAllRecords = cmdLine.hasOption("force_update_all_records");
 				DurstVoyagerHyacinthSync.publishAfterSave = cmdLine.hasOption("publish_after_save");
 				DurstVoyagerHyacinthSync.doTestSaveOnly = cmdLine.hasOption("do_test_save_only");
 				DurstVoyagerHyacinthSync.runTaskVoyagerToHyacinth = cmdLine.hasOption("run_task_voyager_to_hyacinth");

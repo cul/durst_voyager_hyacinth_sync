@@ -98,6 +98,13 @@ public class DurstRecord {
 				)
 			)
 		);
+		
+		// record_content_source-1:record_content_source_value
+		// Value is always NNC
+		dynamicFieldData.put("record_content_source", new JSONArray().put(new JSONObject()
+				.put("record_content_source_value", "NNC")
+			)
+		);
 	}
 
 	private void extractMarcDataFromBibRecord(BetterMarcRecord betterMarcRecord) throws JSONException {
