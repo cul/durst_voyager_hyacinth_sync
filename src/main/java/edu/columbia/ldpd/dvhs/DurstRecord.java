@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,9 +24,31 @@ import org.marc4j.marc.DataField;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.Subfield;
 
+import edu.columbia.ldpd.dvhs.exceptions.UnhandledCoordinateFormatException;
+
 public class DurstRecord {
 	
 	private static final Pattern VALID_035_AND_776_FIELD_PATTERN = Pattern.compile("\\(OCoLC\\)(oc(m|n))*(0*)(\\d+)"); //including (0*) to remove leading zeros
+	private static final Pattern FULL_LAT_LONG_COORDINATE_DECIMAL_FORMAT = Pattern.compile("[-\\d\\.]+,[-\\d\\.]+"); //-12.345,56.7890
+	private static final Pattern DECIMAL_COORDINATE_FORMAT = Pattern.compile("[-\\d\\.]+"); //-12.345
+	
+	private static final Pattern LAT_LONG_SIX_DIGIT_NUMBER_FORMAT = Pattern.compile("(-*\\d{2})(\\d{2})(\\d{2})"); //-738070
+	private static final Pattern LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT = Pattern.compile("(-*\\d{7})(\\d{2})(\\d{2})"); //-0738070
+	private static final Pattern LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT = Pattern.compile("([-\\d])+°([\\d]+)*ʹ*([\\d]+)*ʺ*"); //40° or 40°42ʹ or 40°42ʹ28ʺ
+	
+	// Coordinate types for a single point 
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_3 = Pattern.compile("\\((W|E) (\\d)+°(\\d)+ʹ--(N|S) (\\d)+°(\\d)+ʹ\\)"); // (W 73°50ʹ--N 40°40ʹ)
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_4 = Pattern.compile("\\((W|E) [\\d]+°[\\d]+ʹ[\\d]+ʺ */ *(N|S) [\\d]+°[\\d]+ʹ[\\d]+ʺ\\)"); // (W 74°0ʹ42ʺ /N 40°42ʹ28ʺ)
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_5 = Pattern.compile("\\((\\d)+°(\\d)+ʹ(\\d)+ʺ(N|S) (\\d)+°(\\d)+ʹ(\\d)+ʺ(W|E)\\)"); // (40°47ʹ00ʺN 073°57ʹ58ʺW)
+	
+	// Coordinate types for a range
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_1 = Pattern.compile("(W|E)(\\d)+--(W|E)(\\d)+/(N|S)(\\d)+--(N|S)(\\d)+"); // W738070--W738070/N417176--N417176
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_2 = Pattern.compile("\\((W|E) (\\d)+°(\\d)+ʹ--(W|E) (\\d)+°(\\d)+ʹ/(N|S) (\\d)+°(\\d)+ʹ--(N|S) (\\d)+°(\\d)+ʹ\\)"); // (W 73°80ʹ--W 73°80ʹ/N 41°71ʹ--N 41°71ʹ)
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_6 = Pattern.compile("[-\\d\\.]+--[-\\d\\.]+/[-\\d\\.]+--[-\\d\\.]+"); // -74.0705---73.7512/40.9163--40.544
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_7 = Pattern.compile("\\((W|E) [\\d\\.]+--(W|E) [\\d\\.]+/(N|S) [\\d\\.]+--(N|S) [\\d\\.]+\\)"); // (W 74.0705--W 73.7512/N 40.9163--N 40.544)
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_8 = Pattern.compile("\\((W|E) [\\d\\.]+°--(W|E) [\\d\\.]+°/(N|S) [\\d\\.]+°--(N|S) [\\d\\.]+°\\)"); // (W 74.00°--W 74.00°/N 40.71°--N 40.71°)
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_9 = Pattern.compile("\\((W|E) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*--(W|E) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*/(N|S) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*--(N|S) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*\\)"); // (W 74°00ʹ00ʺ--W 73°52ʹ30ʺ/N 41°15ʹ00ʺ--N 41°07ʹ30ʺ) or (W 73°37ʹ30ʺ--W 73°30ʹ/N 41°15ʹ--N 41°07ʹ30ʺ)
+	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_10 = Pattern.compile("(W|E)[\\d\\.]+--(W|E)[\\d\\.]+/(N|S)[\\d\\.]+--(N|S)[\\d\\.]+"); // W074.000000--W074.000000/N040.710000--N040.710000
 	
 	private JSONObject digitalObjectData;
 	private JSONObject dynamicFieldData;
@@ -591,9 +615,13 @@ public class DurstRecord {
 				StringUtils.join(BetterMarcRecord.getDataFieldValue(field, null, null, 'g'), ", ").trim()
 			).replaceAll(" +", " "); //replaceAll with regex to convert multiple spaces into a single space
 			if( ! result.equals("--/--") ) {
-				coordinatesJSONArray.put(new JSONObject()
-					.put("coordinates_value", normalizeCoordinatesToDecimal(result))
-				);
+				try {
+					coordinatesJSONArray.put(new JSONObject()
+						.put("coordinates_value", normalizeCoordinatesToDecimal(result))
+					);
+				} catch (UnhandledCoordinateFormatException e) {
+					DurstVoyagerHyacinthSync.logger.error("Problem found in record with CLIO ID " + this.getClioIdentifiers().get(0) + ", MARC field 034: " + e.getMessage());
+				}
 			}
 		}
 		fields = betterMarcRecord.getDataFields("255");
@@ -603,9 +631,13 @@ public class DurstRecord {
 					subfieldValue
 				));
 				if( ! result.isEmpty() ) {
-					coordinatesJSONArray.put(new JSONObject()
-						.put("coordinates_value", normalizeCoordinatesToDecimal(result))
-					);
+					try {
+						coordinatesJSONArray.put(new JSONObject()
+							.put("coordinates_value", normalizeCoordinatesToDecimal(result))
+						);
+					} catch (UnhandledCoordinateFormatException e) {
+						DurstVoyagerHyacinthSync.logger.error("Problem found in record with CLIO ID " + this.getClioIdentifiers().get(0) + ", MARC field 255: " + e.getMessage());
+					}
 				}
 			}
 		}
@@ -1197,9 +1229,6 @@ public class DurstRecord {
 			typeOfResourceJSONObject.put("type_of_resource_is_collection", "yes");
 		}
 		typeOfResourceJSONArray.put(typeOfResourceJSONObject);
-		
-		//System.out.println(dynamicFieldData.toString(2));
-		
 	}
 	
 	public void extractDataFromRawMarcHoldingsRecords(File[] rawMarcHoldingsRecords) throws JSONException {
@@ -1383,7 +1412,6 @@ public class DurstRecord {
 			// Note: Last modified string format is "19940223151047.0" (i.e. February 23, 1994, 3:10:47 P.M. (15:10:47)
 			String electronicRecordMarc005Value = electronicRecord.getMarc005Value();
 			if(electronicRecordMarc005Value.compareTo(printRecordMarc005Value) > 1) {
-				System.out.println("Electronic record 005 value of " + electronicRecordMarc005Value + " is greater than print 005 value of " + printRecordMarc005Value + ", so we will use the electronic record value");
 				printRecord.setMarc005Value(electronicRecord.getMarc005Value());
 			}
 			
@@ -1488,20 +1516,200 @@ public class DurstRecord {
 		return clioIdentifiers;
 	}
 	
-	public String normalizeCoordinatesToDecimal(String someCoordinateVal) {
+	public static String normalizeCoordinatesToDecimal(String coordinateVal) throws UnhandledCoordinateFormatException {
 		
-		//TODO: Normalize all non-decimal values into decimal format (i.e. "12.345,56.7890")
+		Matcher m = FULL_LAT_LONG_COORDINATE_DECIMAL_FORMAT.matcher(coordinateVal);
+		if( m.matches() ) {
+			return coordinateVal; // Coordinate is already in the correct format. Return as is.
+		}
 		
-//		Pattern p = Pattern.compile("[\\d\\.]+,[\\d\\.]+");
-//		Matcher m = p.matcher(someCoordinateVal);
-//		
-//		if( ! m.matches() ) {
-//			System.out.println("No match for " + someCoordinateVal);
-//			System.exit(DDBSync.EXIT_CODE_ERROR);
-//		}
+		// Normalize all non-decimal values into decimal format (i.e. "12.345,56.7890")
 		
-		return someCoordinateVal;
+		//Normalize degree characters
+		String normalizedCoordinateVal = coordinateVal.replace("⁰", "°");
 		
+		//Remove leading and trailing parentheses (which should be the only parentheses in the entire string)
+		normalizedCoordinateVal = normalizedCoordinateVal.replace("(", "").replace(")", "");
+		
+		//If this string has only a "--" and no "/", swap the "--" with a "/"
+		if(normalizedCoordinateVal.contains("--") && ! normalizedCoordinateVal.contains("/")) {
+			normalizedCoordinateVal = normalizedCoordinateVal.replace("--", "/");
+		}
+		
+		//If this string doesn't contain any "/" at this point, and only contains one space (" "), replace the space with a "/"
+		if( !normalizedCoordinateVal.contains("/") && normalizedCoordinateVal.indexOf(" ") == normalizedCoordinateVal.lastIndexOf(" ")) {
+			normalizedCoordinateVal = normalizedCoordinateVal.replace(" ", "/");
+		}
+		
+		// W/E is -/+ longitude
+		// N/S is +/- latitude
+		
+		//Identify latitude and longitude sections
+		if( ! normalizedCoordinateVal.contains("/") ) {
+			throw new UnhandledCoordinateFormatException("Unhandled coordinate format (expected \"/\"): " + coordinateVal);
+		}
+		
+		//If there's whitespace around the "/", remove that whitespace
+		normalizedCoordinateVal = normalizedCoordinateVal.replaceAll("\\s*\\/\\s*", "/");
+		
+		String[] parts = normalizedCoordinateVal.split("/");
+		String longitude = null, latitude = null;
+		if(parts[0].contains("W") || parts[0].contains("E")) {
+			// If a W or E are present in the first part, that means we're dealing with longitude first 
+			longitude = parts[0];
+			latitude = parts[1];
+		} else {
+			//Otherwise assume that the first part is latitude
+			latitude = parts[0];
+			longitude = parts[1];
+		}
+		
+		//Convert all "W"s to "-" and "E"s to ""
+		//Convert all "N"s to "" and "S"s to "-"
+		latitude = latitude.replaceAll("N *", "").replaceAll("S *", "-");
+		longitude = longitude.replaceAll("W *", "-").replaceAll("E *", "");
+		
+		//If this is a range, split it up into latStart/latEnd and longStart/longEnd
+		//If it's not a range, redundantly put the single latitude and longitude values in latStart/latEnd and longStart/longEnd
+		String latStart = null, latEnd = null, longStart = null, longEnd = null;
+		if(latitude.contains("--")) {
+			String[] latParts = latitude.split("--");
+			latStart = latParts[0];
+			latEnd = latParts[1];
+		} else {
+			latStart = latitude;
+			latEnd = latitude;
+		}
+		if(longitude.contains("--")) {
+			String[] longParts = longitude.split("--");
+			longStart = longParts[0];
+			longEnd = longParts[1];
+		} else {
+			longStart = longitude;
+			longEnd = longitude;
+		}
+		
+		//If any of the start/end coordinates end in a minus sign, move that minus sign to the beginning
+		if(latStart.endsWith("-")) {
+			latStart = "-" + latStart.substring(0, latStart.length()-1);
+		}
+		if(latEnd.endsWith("-")) {
+			latEnd = "-" + latEnd.substring(0, latEnd.length()-1);
+		}
+		if(longStart.endsWith("-")) {
+			longStart = "-" + longStart.substring(0, longStart.length()-1);
+		}
+		if(longEnd.endsWith("-")) {
+			longEnd = "-" + longEnd.substring(0, longEnd.length()-1);
+		}
+		
+		//Convert seven-digit number values to decimal numbers, if applicable
+		m = LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT.matcher(latStart);
+		if( m.matches() ) {
+			//Group 1 = degrees, 2 = minutes, 3 = seconds
+			latStart = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT.matcher(latEnd);
+		if( m.matches() ) {
+			//Group 1 = degrees, 2 = minutes, 3 = seconds
+			latEnd = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT.matcher(longStart);
+		if( m.matches() ) {
+			longStart = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT.matcher(longEnd);
+		if( m.matches() ) {
+			longEnd = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		
+		//Convert six-digit number values to decimal numbers, if applicable
+		m = LAT_LONG_SIX_DIGIT_NUMBER_FORMAT.matcher(latStart);
+		if( m.matches() ) {
+			//Group 1 = degrees, 2 = minutes, 3 = seconds
+			latStart = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_SIX_DIGIT_NUMBER_FORMAT.matcher(latEnd);
+		if( m.matches() ) {
+			//Group 1 = degrees, 2 = minutes, 3 = seconds
+			latEnd = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_SIX_DIGIT_NUMBER_FORMAT.matcher(longStart);
+		if( m.matches() ) {
+			longStart = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_SIX_DIGIT_NUMBER_FORMAT.matcher(longEnd);
+		if( m.matches() ) {
+			longEnd = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		
+		//Convert degrees minutes seconds, if applicable
+		m = LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT.matcher(latStart);
+		if( m.matches() ) {
+			//Group 1 = degrees, 2 = minutes, 3 = seconds
+			latStart = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT.matcher(latEnd);
+		if( m.matches() ) {
+			//Group 1 = degrees, 2 = minutes, 3 = seconds
+			latEnd = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT.matcher(longStart);
+		if( m.matches() ) {
+			longStart = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		m = LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT.matcher(longEnd);
+		if( m.matches() ) {
+			longEnd = degreesMinutesSecondsToDecomalDegrees(m.group(1), m.group(2), m.group(3));
+		}
+		
+		// If the lat/long start/end values have a degree symbol in them, that's
+		// most likely a sign that we were given a degree range. We need to
+		// remove the degree symbol.
+		latStart = latStart.replace("°", "");
+		latEnd = latEnd.replace("°", "");
+		longStart = longStart.replace("°", "");
+		longEnd = longEnd.replace("°", "");
+		
+		//At this point, latStart/latEnd/longStart/longEnd should all be in the decimal format. If not, we're dealing with an unexpected format
+		if( ! DECIMAL_COORDINATE_FORMAT.matcher(latStart).matches() ||
+			! DECIMAL_COORDINATE_FORMAT.matcher(latEnd).matches() ||
+			! DECIMAL_COORDINATE_FORMAT.matcher(longStart).matches() ||
+			! DECIMAL_COORDINATE_FORMAT.matcher(longEnd).matches()
+		)
+		{
+			throw new UnhandledCoordinateFormatException("Unhandled coordinate format: " + coordinateVal);
+		}
+		
+		//If we got here, then we have four decimal coordiantes.  We'll average them into two coordinates.
+		double averagedLatitude = (Double.parseDouble(latStart) + Double.parseDouble(latEnd))/2.0;
+		double averagedLongitude = (Double.parseDouble(longStart) + Double.parseDouble(longEnd))/2.0;
+		
+		//Truncate to four decimal places max
+		averagedLatitude = new BigDecimal(averagedLatitude).setScale(4, RoundingMode.HALF_EVEN).doubleValue();
+		averagedLongitude = new BigDecimal(averagedLongitude).setScale(4, RoundingMode.HALF_EVEN).doubleValue();
+		
+		String finalConvertedCoordinates = averagedLatitude + "," + averagedLongitude;
+		
+		m = FULL_LAT_LONG_COORDINATE_DECIMAL_FORMAT.matcher(finalConvertedCoordinates);
+		if( m.matches() ) {
+			return finalConvertedCoordinates; // Coordinate is already in the correct format. Return as is.
+		} else {
+			throw new UnhandledCoordinateFormatException("Unhandled coordinate format: " + coordinateVal);
+		}
+	}
+
+	private static String degreesMinutesSecondsToDecomalDegrees(String degrees, String minutes, String seconds) {
+		
+		double value = Double.parseDouble(degrees);
+		if(minutes != null) {
+			value += Double.parseDouble(minutes)/60.0;
+		}
+		if(seconds != null) {
+			value += Double.parseDouble(seconds)/3600.0;
+		}
+		
+		return "" + value;
 	}
 	
 }

@@ -93,7 +93,7 @@ public class DurstVoyagerHyacinthSync {
 			task.runTask();
 		}
 		
-		System.out.println("DurstVoyagerHyacinthSync run complete!");
+		DurstVoyagerHyacinthSync.logger.info("DurstVoyagerHyacinthSync run complete!");
 
 	}
 

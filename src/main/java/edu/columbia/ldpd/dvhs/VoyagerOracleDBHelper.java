@@ -72,7 +72,7 @@ public class VoyagerOracleDBHelper {
 			DurstVoyagerHyacinthSync.logger.error("Error: Could not close Voyager connection.");
 			e.printStackTrace();
 		}
-		System.out.println("Closed connection to Voyager database.");
+		DurstVoyagerHyacinthSync.logger.info("Closed connection to Voyager database.");
 	}
 	
 	public static Connection getNewDBConnection(String url, String database, String username, String password) {
@@ -101,7 +101,7 @@ public class VoyagerOracleDBHelper {
 		    System.exit(DurstVoyagerHyacinthSync.EXIT_CODE_ERROR);
 		}
 
-		System.out.println("Successfuly connected to Voyager database: " + database);
+		DurstVoyagerHyacinthSync.logger.info("Successfuly connected to Voyager database: " + database);
 		
 		return newConn;
 	}
@@ -170,7 +170,6 @@ public class VoyagerOracleDBHelper {
 			String holdingData = entry.getValue();
 			
 			InputStream is = IOUtils.toInputStream(holdingData, "UTF-8");
-			//System.out.println(marcHoldingsFile.getAbsolutePath());
 			MarcReader reader = new MarcStreamReader(is);
 	        while (reader.hasNext()) { 
 	            Record record = reader.next();
@@ -252,89 +251,4 @@ public class VoyagerOracleDBHelper {
 		
 		return holdingsKeysToRecords;
 	}
-	
-	
-	
-	
-	
-	
-	
-	/*
-	//This method isn't getting these values in the best way. We should read the MARC instead of capturing
-	//patterns with a regular expression matcher.
-	public static ArrayList<ArrayList<String>> getValuesFor866And950Fields(String clioBibKey) throws SQLException {
-		
-		ArrayList<String> valuesFor866Fields = new ArrayList<String>();
-		ArrayList<String> valuesFor950Fields = new ArrayList<String>();
-		
-		String query;
-		PreparedStatement pstmt;
-		
-		query = "select mfhd_id from bib_mfhd where bib_id = ?";
-		pstmt = staticVoyagerConnection.prepareStatement(query);
-		pstmt.setString(1, clioBibKey);
-		
-		ResultSet resultSet = pstmt.executeQuery();
-		
-		ArrayList<String> holdingsKeys = new ArrayList<String>(); 
-		
-		while(resultSet.next()) {
-			holdingsKeys.add(resultSet.getString(1));
-		}
-		
-		resultSet.close();
-		pstmt.close();
-		
-		// Now we have one or more holdingsKeys for this record.
-		// We'll need to iterate through these keys, look up
-		// each of the holdings, figure out which holding is
-		// the one that we want, and then get the 866 and 950 fields from it.
-		// Note: We'll be getting raw MARC back for the holdings records.
-		// Note: Holdings records are stored in 300 character segments, so
-		// if a query for a specific record gives us multiple results, we
-		// need to concatenate those results into a single holdings string.
-		
-		query = "select record_segment from mfhd_data where mfhd_id = ? order by seqnum";
-		
-		for(String singleHoldingsKey : holdingsKeys) {
-			
-			pstmt = staticVoyagerConnection.prepareStatement(query);
-			
-			pstmt.setString(1, singleHoldingsKey);
-			resultSet = pstmt.executeQuery();
-			
-			String holdingsResultData = ""; 
-			
-			while(resultSet.next()) {
-				holdingsResultData += resultSet.getString(1);
-			}
-			
-			Matcher matcher;
-			
-			//Find DIM id
-			matcher = dimsIdPattern.matcher(holdingsResultData);
-			if(matcher.matches()) {
-				valuesFor950Fields.add(matcher.group(1));
-			}
-			
-			//Find Enumeration and Chronology
-			matcher = enumerationAndChronologyPattern.matcher(holdingsResultData);
-			if(matcher.matches()) {
-				valuesFor866Fields.add(matcher.group(1));
-			}
-			
-			resultSet.close();
-			pstmt.close();
-			
-			//System.out.println("Holdings Result Data: " + holdingsResultData);
-		}
-		
-		ArrayList<ArrayList<String>> arrToReturn = new ArrayList<ArrayList<String>>();
-		arrToReturn.add(0, valuesFor866Fields);
-		arrToReturn.add(1, valuesFor950Fields);
-		
-		return arrToReturn;
-	}
-	*/
-	
 }

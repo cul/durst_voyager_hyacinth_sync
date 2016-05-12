@@ -17,6 +17,8 @@ import org.jafer.zclient.ZClientFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import edu.columbia.ldpd.dvhs.DurstVoyagerHyacinthSync;
+
 
 public class MARCFetcher {
 	
@@ -77,7 +79,7 @@ public class MARCFetcher {
      */
     public void fetch(int queryType, int queryField, String queryValue){
     	
-    	System.out.println("Fetching MARC files...");
+    	DurstVoyagerHyacinthSync.logger.info("Fetching MARC files...");
     	
         if (!targetDir.exists()) targetDir.mkdirs();
         int[] query = {0,0,0,0,0,0};
@@ -108,7 +110,7 @@ public class MARCFetcher {
             int len = client.getNumberOfResults();
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer t = null;
-            System.out.println("Found " + len + " results!");
+            DurstVoyagerHyacinthSync.logger.info("Found " + len + " results!");
             try{
                 t = tf.newTransformer();
             } catch (TransformerException e){
@@ -116,27 +118,13 @@ public class MARCFetcher {
                 return;
             }
             for (int i=1;i<=len;i++){
-            	System.out.println("Retrieving result: " + i + " of " + len);
+            	DurstVoyagerHyacinthSync.logger.info("Retrieving result: " + i + " of " + len);
             	
                 client.setRecordCursor(i);
                 f = client.getCurrentRecord();
-                //System.out.println("out: " + client.getCurrentRecord().getAllFieldData(","));
                 Node domXml = f.getXML();
                 String id = get001(domXml);
                 
-//                System.out.println(id);
-//                if(id.equals("10308213") || id.equals("10208124") || id.equals("10207197") || id.equals("10226595") || id.equals("153674")) {
-//                	System.out.println("FOUND ONE!");
-//                	
-//                	if(id.equals("10308213")) {
-//                		System.out.println("But it's 10308213 and it should be suppressed.  Why am I seeing this?");
-//                	}
-//                	
-//                	System.exit(DDBSync.EXIT_CODE_SUCCESS);
-//                }
-//                if(true){continue;}
-                
-                //System.out.println("Fetching record with bib_key: " + id);
                 DOMSource xmlSource = new DOMSource(f.getXML());
                 StreamResult outputTarget = getResult(id);
                 try{

@@ -156,8 +156,6 @@ public class HyacinthUtils {
 		
 		post.setEntity(new UrlEncodedFormEntity(urlParameters, "UTF-8"));
 		HttpResponse response = client.execute(post);
-		
-		// System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
 		 
 		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 		StringBuffer resultSb = new StringBuffer();

@@ -199,6 +199,8 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 			}
 			if(mergeError != null) {
 				mergeErrors.add(mergeError);
+			} else {
+				finalizedRecordsToImport.add(printRecord);
 			}
 		}
 		
@@ -239,7 +241,7 @@ public class VoyagerToHyacinthTask extends AbstractTask {
 				Thread.sleep(500);
 			} catch (InterruptedException e) { e.printStackTrace(); }
         }
-        System.out.println("Thread pool has been shut down. All jobs are complete.");
+        DurstVoyagerHyacinthSync.logger.info("Thread pool has been shut down. All jobs are complete.");
 	}
 
 	public void clearDownloadedVoyagerContent() {
