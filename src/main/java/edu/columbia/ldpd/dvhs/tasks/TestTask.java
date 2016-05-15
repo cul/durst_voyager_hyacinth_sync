@@ -1,14 +1,9 @@
 package edu.columbia.ldpd.dvhs.tasks;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import org.json.JSONException;
-
 import edu.columbia.ldpd.dvhs.DurstRecord;
-import edu.columbia.ldpd.dvhs.exceptions.MultipleRecordsException;
 import edu.columbia.ldpd.dvhs.exceptions.UnhandledCoordinateFormatException;
-import edu.columbia.ldpd.dvhs.utils.HyacinthUtils;
 
 public class TestTask extends AbstractTask {
 	

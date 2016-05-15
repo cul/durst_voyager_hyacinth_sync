@@ -36,20 +36,6 @@ public class DurstRecord {
 	private static final Pattern LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT = Pattern.compile("(-*\\d{3})(\\d{2})(\\d{2})"); //-0738070
 	private static final Pattern LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT = Pattern.compile("([-\\d])+°([\\d]+)*ʹ*([\\d]+)*ʺ*"); //40° or 40°42ʹ or 40°42ʹ28ʺ
 	
-	// Coordinate types for a single point 
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_3 = Pattern.compile("\\((W|E) (\\d)+°(\\d)+ʹ--(N|S) (\\d)+°(\\d)+ʹ\\)"); // (W 73°50ʹ--N 40°40ʹ)
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_4 = Pattern.compile("\\((W|E) [\\d]+°[\\d]+ʹ[\\d]+ʺ */ *(N|S) [\\d]+°[\\d]+ʹ[\\d]+ʺ\\)"); // (W 74°0ʹ42ʺ /N 40°42ʹ28ʺ)
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_5 = Pattern.compile("\\((\\d)+°(\\d)+ʹ(\\d)+ʺ(N|S) (\\d)+°(\\d)+ʹ(\\d)+ʺ(W|E)\\)"); // (40°47ʹ00ʺN 073°57ʹ58ʺW)
-	
-	// Coordinate types for a range
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_1 = Pattern.compile("(W|E)(\\d)+--(W|E)(\\d)+/(N|S)(\\d)+--(N|S)(\\d)+"); // W738070--W738070/N417176--N417176
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_2 = Pattern.compile("\\((W|E) (\\d)+°(\\d)+ʹ--(W|E) (\\d)+°(\\d)+ʹ/(N|S) (\\d)+°(\\d)+ʹ--(N|S) (\\d)+°(\\d)+ʹ\\)"); // (W 73°80ʹ--W 73°80ʹ/N 41°71ʹ--N 41°71ʹ)
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_6 = Pattern.compile("[-\\d\\.]+--[-\\d\\.]+/[-\\d\\.]+--[-\\d\\.]+"); // -74.0705---73.7512/40.9163--40.544
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_7 = Pattern.compile("\\((W|E) [\\d\\.]+--(W|E) [\\d\\.]+/(N|S) [\\d\\.]+--(N|S) [\\d\\.]+\\)"); // (W 74.0705--W 73.7512/N 40.9163--N 40.544)
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_8 = Pattern.compile("\\((W|E) [\\d\\.]+°--(W|E) [\\d\\.]+°/(N|S) [\\d\\.]+°--(N|S) [\\d\\.]+°\\)"); // (W 74.00°--W 74.00°/N 40.71°--N 40.71°)
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_9 = Pattern.compile("\\((W|E) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*--(W|E) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*/(N|S) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*--(N|S) [\\d\\.]+°[\\d\\.]+ʹ([\\d\\.]+ʺ)*\\)"); // (W 74°00ʹ00ʺ--W 73°52ʹ30ʺ/N 41°15ʹ00ʺ--N 41°07ʹ30ʺ) or (W 73°37ʹ30ʺ--W 73°30ʹ/N 41°15ʹ--N 41°07ʹ30ʺ)
-	private static final Pattern LAT_LONG_COORDINATE_ALT_FORMAT_10 = Pattern.compile("(W|E)[\\d\\.]+--(W|E)[\\d\\.]+/(N|S)[\\d\\.]+--(N|S)[\\d\\.]+"); // W074.000000--W074.000000/N040.710000--N040.710000
-	
 	private JSONObject digitalObjectData;
 	private JSONObject dynamicFieldData;
 	private ArrayList<String> ocolc035FieldValues = new ArrayList<String>();
@@ -398,7 +384,6 @@ public class DurstRecord {
 		dynamicFieldData.put("date_issued", dateIssuedJSONArray);
 		JSONArray dateOtherJSONArray = new JSONArray();
 		dynamicFieldData.put("date_other", dateOtherJSONArray);
-		HashMap<String, String> start_and_end_and_type_and_keydate = new HashMap<String, String>();
 		String typeOfDate = betterMarcRecord.getControlField("008").getData().substring(6, 7).trim();
 		String date1 = betterMarcRecord.getControlField("008").getData().substring(7, 11).trim();
 		String date2 = betterMarcRecord.getControlField("008").getData().substring(11, 15).trim();

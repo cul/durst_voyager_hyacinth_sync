@@ -69,7 +69,6 @@ public class HyacinthUtils {
 				return results.getJSONObject(0).getString("pid");
 			default:
 				// Found multiple Hyacinth records with this CLIO identifier, indicating that something went wrong. Inform the user.
-				String erorrMessage = "Found multiple Hyacinth records with CLIO identifier " + clioIdentifier + ": ";
 				ArrayList<String> pids = new ArrayList<String>();
 				for(int i = 0; i < results.length(); i++) {
 					pids.add(results.getJSONObject(i).getString("pid"));
