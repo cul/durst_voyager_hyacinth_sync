@@ -29,11 +29,11 @@ import edu.columbia.ldpd.dvhs.exceptions.UnhandledCoordinateFormatException;
 public class DurstRecord {
 	
 	private static final Pattern VALID_035_AND_776_FIELD_PATTERN = Pattern.compile("\\(OCoLC\\)(oc(m|n))*(0*)(\\d+)"); //including (0*) to remove leading zeros
-	private static final Pattern FULL_LAT_LONG_COORDINATE_DECIMAL_FORMAT = Pattern.compile("[-\\d\\.]+,[-\\d\\.]+"); //-12.345,56.7890
+	private static final Pattern FULL_LAT_LONG_COORDINATE_DECIMAL_FORMAT = Pattern.compile("^-*\\d{0,2}(\\.\\d+)*,-*\\d{0,3}(\\.\\d+)*$"); //-12.345,56.7890
 	private static final Pattern DECIMAL_COORDINATE_FORMAT = Pattern.compile("[-\\d\\.]+"); //-12.345
 	
 	private static final Pattern LAT_LONG_SIX_DIGIT_NUMBER_FORMAT = Pattern.compile("(-*\\d{2})(\\d{2})(\\d{2})"); //-738070
-	private static final Pattern LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT = Pattern.compile("(-*\\d{7})(\\d{2})(\\d{2})"); //-0738070
+	private static final Pattern LAT_LONG_SEVEN_DIGIT_NUMBER_FORMAT = Pattern.compile("(-*\\d{3})(\\d{2})(\\d{2})"); //-0738070
 	private static final Pattern LAT_LONG_DEGREES_MINUTES_SECONDS_FORMAT = Pattern.compile("([-\\d])+°([\\d]+)*ʹ*([\\d]+)*ʺ*"); //40° or 40°42ʹ or 40°42ʹ28ʺ
 	
 	// Coordinate types for a single point 

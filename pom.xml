@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.columbia.ldpd</groupId>
 	<artifactId>durst_voyager_hyacinth_sync</artifactId>
-	<version>2.0.0</version>
+	<version>2.0.1</version>
 	<name>Durst Voyager Hyacinth Sync</name>
 	<description>Application for syncing Durst Voyager MARC data to Hyacinth.</description>
 	<organization>
