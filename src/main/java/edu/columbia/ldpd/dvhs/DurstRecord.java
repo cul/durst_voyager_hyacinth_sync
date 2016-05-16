@@ -130,7 +130,7 @@ public class DurstRecord {
 			new JSONObject()
 				.put("clio_identifier_value", betterMarcRecord.getControlField("001").getData().trim())
 				.put("clio_identifier_type", this.isElectronicRecord ? "electronic" : "print")
-				.put("clio_identifier_omit_from_mods", !this.isElectronicRecord) // omit print records from MODS
+				.put("clio_identifier_omit_from_mods", this.isElectronicRecord) // omit electronic records from MODS
 		));
 		
 		
