@@ -45,8 +45,7 @@ public class HyacinthUtils {
 		urlParameters.add(new BasicNameValuePair("_method", "POST"));
 		urlParameters.add(new BasicNameValuePair("search[fq][project_string_key_sim][0][equals]", "durst")); // Durst project
 		urlParameters.add(new BasicNameValuePair("search[fq][df_clio_identifier_value_sim][0][equals]", clioIdentifier)); // Specific CLIO identifier search
-		urlParameters.add(new BasicNameValuePair("facet", "false")); //No need to facet. Better performance.
-
+		
 		//Make sure to use UTF-8
 		post.setEntity(new UrlEncodedFormEntity(urlParameters, "UTF-8"));
 		HttpResponse response = client.execute(post);
@@ -57,6 +56,7 @@ public class HyacinthUtils {
 		while ((line = rd.readLine()) != null) {
 			resultSb.append(line);
 		}
+		
 		JSONObject jsonResponse = new JSONObject(resultSb.toString());
 		JSONArray results = jsonResponse.getJSONArray("results");
 		
@@ -99,8 +99,7 @@ public class HyacinthUtils {
 		urlParameters.add(new BasicNameValuePair("search[fq][project_string_key_sim][0][equals]", "durst")); // To be safe, limit scope to Durst project
 		urlParameters.add(new BasicNameValuePair("search[fq][pid][0][equals]", pidForRecord)); // Search by pid
 		urlParameters.add(new BasicNameValuePair("search[fq][df_marc_005_last_modified_value_sim][0][equals]", marc005Value)); // Attempt to find match for existing 005 update time
-		urlParameters.add(new BasicNameValuePair("facet", "false")); //No need to facet. Better performance.
-	 
+		
 		post.setEntity(new UrlEncodedFormEntity(urlParameters, "UTF-8"));
 		HttpResponse response = client.execute(post);
 		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
@@ -109,6 +108,8 @@ public class HyacinthUtils {
 		while ((line = rd.readLine()) != null) {
 			resultSb.append(line);
 		}
+		
+		System.out.println("recordHasSpecificMarc005Value response: " + resultSb.toString());
 		JSONObject jsonResponse = new JSONObject(resultSb.toString());
 		JSONArray results = jsonResponse.getJSONArray("results");
 		
